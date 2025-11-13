@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demodb?currentSchema=company
+    username: user_db
+    password: user123
+
+    jpa:
+      hibernate:
+        ddl-auto: create
+        properties:
+          hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
