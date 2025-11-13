@@ -24,9 +24,11 @@ public class Task {
     @Setter(AccessLevel.NONE)
     private Long id;
 
+    @Column(nullable = false)
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Status status = Status.TODO;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)

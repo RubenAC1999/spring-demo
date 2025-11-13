@@ -1,9 +1,8 @@
 package com.example.demoPersonal.dto.task;
 
 import com.example.demoPersonal.entity.enums.Status;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,10 +12,11 @@ public class TaskResponseDTO {
     @Setter(AccessLevel.NONE)
     private Long id;
 
-    @NotBlank
     private String description;
-
-    @NotNull
     private Status status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private Long employeeId;
+    private Long projectId;
 
 }
