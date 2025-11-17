@@ -14,4 +14,5 @@ public class ProjectRequestDTO {
 
     @NotBlank(message = "Name is required")
     private String name;
+
 }
