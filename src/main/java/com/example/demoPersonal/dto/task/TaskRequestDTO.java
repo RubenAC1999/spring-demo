@@ -19,6 +19,8 @@ public class TaskRequestDTO {
     @NotNull(message = "Status is required")
     private Status status;
 
+    @NotNull(message = "Project ID is required")
+    private Long projectId;
 
     // No hace falta poner Status, Status por defecto -> TODO
     public TaskRequestDTO(String description) {

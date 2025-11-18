@@ -1,8 +1,12 @@
 package com.example.demoPersonal.service;
 
+import com.example.demoPersonal.dto.employee.EmployeeResponseDTO;
 import com.example.demoPersonal.dto.project.ProjectRequestDTO;
 import com.example.demoPersonal.dto.project.ProjectResponseDTO;
+import com.example.demoPersonal.dto.task.TaskResponseDTO;
+import com.example.demoPersonal.entity.Employee;
 import com.example.demoPersonal.entity.Project;
+import com.example.demoPersonal.entity.Task;
 import com.example.demoPersonal.exception.ProjectNotFoundException;
 import com.example.demoPersonal.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,30 @@ public class ProjectService {
         return new ProjectResponseDTO(
                 project.getId(),
                 project.getName()
+        );
+    }
+
+    private TaskResponseDTO mapTaskToResponse(Task task) {
+        Long employeeId = task.getEmployee() != null ? task.getEmployee().getId() : null;
+        Long projectId = task.getProject().getId();
+
+        return new TaskResponseDTO(
+                task.getId(),
+                task.getDescription(),
+                task.getStatus(),
+                task.getCreatedAt(),
+                task.getUpdatedAt(),
+                employeeId,
+                projectId
+        );
+    }
+
+    private EmployeeResponseDTO mapEmployeeToResponse(Employee employee) {
+        return new EmployeeResponseDTO(
+                employee.getId(),
+                employee.getName(),
+                employee.getEmail(),
+                employee.getPosition()
         );
     }
 
@@ -62,6 +90,22 @@ public class ProjectService {
         return mapProjectToResponse(updated);
     }
 
+    public void removeProject(Long id) {
+        Project project = findProjectOrThrow(id);
 
+        projectRepository.delete(project);
+    }
+
+    public List<TaskResponseDTO> getProjectTasks(Long id) {
+        Project project = findProjectOrThrow(id);
+
+        return project.getTasks().stream().map(this::mapTaskToResponse).toList();
+    }
+
+    public List<EmployeeResponseDTO> getProjectEmployees(Long id) {
+        Project project = findProjectOrThrow(id);
+
+        return project.getEmployees().stream().map(this::mapEmployeeToResponse).toList();
+    }
 
 }

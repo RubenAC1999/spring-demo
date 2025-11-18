@@ -45,8 +45,9 @@ public class Employee {
     )
     private List<Project> projects = new ArrayList<>();
 
-    public Employee(String name, Position position) {
+    public Employee(String name, String email, Position position) {
         this.name = name;
+        this.email = email;
         this.position = position;
     }
 }

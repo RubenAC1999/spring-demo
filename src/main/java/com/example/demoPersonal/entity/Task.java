@@ -53,11 +53,6 @@ public class Task {
     @Setter(AccessLevel.NONE)
     private LocalDateTime updatedAt;
 
-    public Task(String description, Employee employee, Project project) {
-        this.description = description;
-        this.employee = employee;
-        this.project = project;
-    }
 
     public Task(String description, Project project) {
         this.description = description;

@@ -18,5 +18,4 @@ public class TaskResponseDTO {
     private LocalDateTime updatedAt;
     private Long employeeId;
     private Long projectId;
-
 }
