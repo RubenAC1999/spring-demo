@@ -2,13 +2,14 @@ package com.example.demoPersonal.mapper.task;
 
 import com.example.demoPersonal.dto.task.TaskRequestDTO;
 import com.example.demoPersonal.dto.task.TaskResponseDTO;
+import com.example.demoPersonal.entity.Employee;
+import com.example.demoPersonal.entity.Project;
 import com.example.demoPersonal.entity.Task;
 
 public class TaskMapperImpl implements TaskMapper {
 
     @Override
     public TaskResponseDTO toDTO(Task task) {
-
         return new TaskResponseDTO(
                 task.getId(),
                 task.getDescription(),
@@ -21,10 +22,10 @@ public class TaskMapperImpl implements TaskMapper {
     }
 
     @Override
-    public Task toEntity(TaskRequestDTO dto) {
+    public Task toEntity(TaskRequestDTO dto, Project project) {
         return new Task(
                 dto.getDescription(),
-                dto.getProjectId()
+                project
         );
     }
 }

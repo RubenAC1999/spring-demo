@@ -8,12 +8,13 @@ import com.example.demoPersonal.entity.Task;
 import com.example.demoPersonal.entity.enums.Position;
 import com.example.demoPersonal.exception.EmployeeExistsException;
 import com.example.demoPersonal.exception.EmployeeNotFoundException;
+import com.example.demoPersonal.mapper.employee.EmployeeMapper;
+import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
 import com.example.demoPersonal.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,36 +23,18 @@ public class EmployeeService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
 
+    private final EmployeeMapper employeeMapper;
+    private final TaskMapper taskMapper;
+
     public EmployeeService(EmployeeRepository employeeRepository, TaskRepository taskRepository,
-                           ProjectRepository projectRepository) {
+                           ProjectRepository projectRepository, EmployeeMapper employeeMapper, TaskMapper taskMapper) {
         this.employeeRepository = employeeRepository;
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
+        this.employeeMapper = employeeMapper;
+        this.taskMapper = taskMapper;
     }
 
-    private EmployeeResponseDTO mapToResponse(Employee employee) {
-        return new EmployeeResponseDTO(
-                employee.getId(),
-                employee.getName(),
-                employee.getEmail(),
-                employee.getPosition()
-        );
-    }
-
-    private TaskResponseDTO mapTaskToResponse(Task task) {
-        Long employeeId = task.getEmployee() != null ? task.getEmployee().getId() : null;
-        Long projectId = task.getProject().getId();
-
-        return new TaskResponseDTO(
-                task.getId(),
-                task.getDescription(),
-                task.getStatus(),
-                task.getCreatedAt(),
-                task.getUpdatedAt(),
-                employeeId,
-                projectId
-        );
-    }
 
     private Employee findByIdOrThrow(Long id) {
         return employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
@@ -71,17 +54,17 @@ public class EmployeeService {
 
         Employee saved = employeeRepository.save(employee);
 
-        return mapToResponse(saved);
+        return employeeMapper.toDTO(saved);
     }
 
     public EmployeeResponseDTO getEmployeeById(Long id) {
        Employee employee = findByIdOrThrow(id);
 
-       return mapToResponse(employee);
+       return employeeMapper.toDTO(employee);
     }
 
     public List<EmployeeResponseDTO> getAllEmployees() {
-        return employeeRepository.findAll().stream().map(this::mapToResponse).toList();
+        return employeeRepository.findAll().stream().map(employeeMapper::toDTO).toList();
     }
 
     public EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO dto) {
@@ -99,7 +82,7 @@ public class EmployeeService {
 
         Employee updated = employeeRepository.save(employee);
 
-        return mapToResponse(updated);
+        return employeeMapper.toDTO(updated);
     }
 
     public void removeEmployee(Long id) {
@@ -114,21 +97,21 @@ public class EmployeeService {
         Employee employee = employeeRepository.findByEmail(emailNormalized)
                 .orElseThrow(() -> new EmployeeNotFoundException(emailNormalized));
 
-        return mapToResponse(employee);
+        return employeeMapper.toDTO(employee);
     }
 
     public List<EmployeeResponseDTO> getEmployeeByName(String name) {
-        return employeeRepository.findByNameIgnoreCase(name).stream().map(this::mapToResponse).toList();
+        return employeeRepository.findByNameIgnoreCase(name).stream().map(employeeMapper::toDTO).toList();
     }
 
     public List<EmployeeResponseDTO> getEmployeesByPosition(Position position) {
-        return employeeRepository.findByPosition(position).stream().map(this::mapToResponse).toList();
+        return employeeRepository.findByPosition(position).stream().map(employeeMapper::toDTO).toList();
     }
 
     public List<TaskResponseDTO> listEmployeeTasks(Long id) {
         Employee employee = findByIdOrThrow(id);
 
-        return employee.getTasks().stream().map(this::mapTaskToResponse).toList();
+        return employee.getTasks().stream().map(taskMapper::toDTO).toList();
     }
 
 }
