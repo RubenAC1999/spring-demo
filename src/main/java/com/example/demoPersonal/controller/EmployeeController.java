@@ -1,13 +1,15 @@
 package com.example.demoPersonal.controller;
 
+import com.example.demoPersonal.dto.employee.EmployeeRequestDTO;
 import com.example.demoPersonal.dto.employee.EmployeeResponseDTO;
+import com.example.demoPersonal.dto.task.TaskResponseDTO;
+import com.example.demoPersonal.entity.enums.Position;
 import com.example.demoPersonal.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -29,6 +31,45 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
-    //TODO: crear los demás métodos del controller
+    @GetMapping("/search")
+    public ResponseEntity<EmployeeResponseDTO> getEmployeeByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(employeeService.getEmployeeByEmail(email));
+    }
 
+    @GetMapping("/search-by-name")
+    public ResponseEntity<List<EmployeeResponseDTO>> getEmployeesByName(@RequestParam String name) {
+        return ResponseEntity.ok(employeeService.getEmployeeByName(name));
+    }
+
+    @GetMapping("/search-by-position")
+    public ResponseEntity<List<EmployeeResponseDTO>> getEmployeesByPosition(@RequestParam Position position) {
+        return ResponseEntity.ok(employeeService.getEmployeesByPosition(position));
+    }
+
+    @PostMapping
+    public ResponseEntity<EmployeeResponseDTO> createEmployee(@RequestBody @Valid EmployeeRequestDTO dto) {
+        EmployeeResponseDTO created = employeeService.createEmployee(dto);
+
+        URI location = URI.create("/employees/" + created.getId());
+
+        return ResponseEntity.created(location).body(created);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id,
+                                                              @RequestBody @Valid EmployeeRequestDTO dto) {
+        return ResponseEntity.ok(employeeService.updateEmployee(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removeEmployee(@PathVariable Long id) {
+        employeeService.removeEmployee(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/tasks")
+    public ResponseEntity<List<TaskResponseDTO>> getEmployeeTasks(@PathVariable Long id) {
+        return ResponseEntity.ok(employeeService.getEmployeeTasks(id));
+    }
 }

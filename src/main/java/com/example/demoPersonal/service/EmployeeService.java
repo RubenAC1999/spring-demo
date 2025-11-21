@@ -108,7 +108,7 @@ public class EmployeeService {
         return employeeRepository.findByPosition(position).stream().map(employeeMapper::toDTO).toList();
     }
 
-    public List<TaskResponseDTO> listEmployeeTasks(Long id) {
+    public List<TaskResponseDTO> getEmployeeTasks(Long id) {
         Employee employee = findByIdOrThrow(id);
 
         return employee.getTasks().stream().map(taskMapper::toDTO).toList();
