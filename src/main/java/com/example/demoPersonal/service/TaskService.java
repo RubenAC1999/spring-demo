@@ -56,8 +56,8 @@ public class TaskService {
         return taskMapper.toDTO(task);
     }
 
-    public List<TaskResponseDTO> getTaskByName(String name) {
-        return taskRepository.findByName(name).stream().map(taskMapper::toDTO).toList();
+    public List<TaskResponseDTO> getTasksByDescription(String description) {
+        return taskRepository.findByDescription(description).stream().map(taskMapper::toDTO).toList();
     }
     public List<TaskResponseDTO> getTaskByStatus(Status status) {
         return taskRepository.findByStatus(status).stream().map(taskMapper::toDTO).toList();
@@ -113,6 +113,4 @@ public class TaskService {
 
         return taskMapper.toDTO(unassigned);
     }
-
-
 }

@@ -2,10 +2,12 @@ package com.example.demoPersonal.mapper.task;
 
 import com.example.demoPersonal.dto.task.TaskRequestDTO;
 import com.example.demoPersonal.dto.task.TaskResponseDTO;
-import com.example.demoPersonal.entity.Employee;
 import com.example.demoPersonal.entity.Project;
 import com.example.demoPersonal.entity.Task;
+import org.springframework.stereotype.Component;
 
+
+@Component
 public class TaskMapperImpl implements TaskMapper {
 
     @Override

@@ -3,7 +3,9 @@ package com.example.demoPersonal.mapper.employee;
 import com.example.demoPersonal.dto.employee.EmployeeRequestDTO;
 import com.example.demoPersonal.dto.employee.EmployeeResponseDTO;
 import com.example.demoPersonal.entity.Employee;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EmployeeMapperImpl implements EmployeeMapper {
 
     @Override

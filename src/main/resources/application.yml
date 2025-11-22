@@ -1,7 +1,7 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/demodb?currentSchema=company
-    username: user_db
+    username: db_user
     password: user123
 
     jpa:
