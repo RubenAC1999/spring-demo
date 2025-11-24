@@ -72,4 +72,9 @@ public class EmployeeController {
     public ResponseEntity<List<TaskResponseDTO>> getEmployeeTasks(@PathVariable Long id) {
         return ResponseEntity.ok(employeeService.getEmployeeTasks(id));
     }
+
+    @PutMapping("/{id}/projects/{projectId}")
+    public ResponseEntity<EmployeeResponseDTO> assignProject(@PathVariable Long id, @PathVariable Long projectId) {
+        return ResponseEntity.ok(employeeService.assignProject(id, projectId));
+    }
 }

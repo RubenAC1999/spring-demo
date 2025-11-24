@@ -4,20 +4,23 @@ import com.example.demoPersonal.dto.employee.EmployeeRequestDTO;
 import com.example.demoPersonal.dto.employee.EmployeeResponseDTO;
 import com.example.demoPersonal.dto.task.TaskResponseDTO;
 import com.example.demoPersonal.entity.Employee;
-import com.example.demoPersonal.entity.Task;
+import com.example.demoPersonal.entity.Project;
 import com.example.demoPersonal.entity.enums.Position;
 import com.example.demoPersonal.exception.EmployeeExistsException;
 import com.example.demoPersonal.exception.EmployeeNotFoundException;
+import com.example.demoPersonal.exception.ProjectNotFoundException;
 import com.example.demoPersonal.mapper.employee.EmployeeMapper;
 import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
 import com.example.demoPersonal.repository.TaskRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final TaskRepository taskRepository;
@@ -35,7 +38,7 @@ public class EmployeeService {
         this.taskMapper = taskMapper;
     }
 
-
+    @Transactional(readOnly = true)
     private Employee findByIdOrThrow(Long id) {
         return employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
     }
@@ -57,12 +60,14 @@ public class EmployeeService {
         return employeeMapper.toDTO(saved);
     }
 
+    @Transactional(readOnly = true)
     public EmployeeResponseDTO getEmployeeById(Long id) {
        Employee employee = findByIdOrThrow(id);
 
        return employeeMapper.toDTO(employee);
     }
 
+    @Transactional(readOnly = true)
     public List<EmployeeResponseDTO> getAllEmployees() {
         return employeeRepository.findAll().stream().map(employeeMapper::toDTO).toList();
     }
@@ -91,6 +96,7 @@ public class EmployeeService {
         employeeRepository.delete(employee);
     }
 
+    @Transactional(readOnly = true)
     public EmployeeResponseDTO getEmployeeByEmail(String email) {
         String emailNormalized = email.toLowerCase();
 
@@ -100,18 +106,32 @@ public class EmployeeService {
         return employeeMapper.toDTO(employee);
     }
 
+    @Transactional(readOnly = true)
     public List<EmployeeResponseDTO> getEmployeeByName(String name) {
         return employeeRepository.findByNameIgnoreCase(name).stream().map(employeeMapper::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<EmployeeResponseDTO> getEmployeesByPosition(Position position) {
         return employeeRepository.findByPosition(position).stream().map(employeeMapper::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<TaskResponseDTO> getEmployeeTasks(Long id) {
         Employee employee = findByIdOrThrow(id);
 
         return employee.getTasks().stream().map(taskMapper::toDTO).toList();
     }
 
+    public EmployeeResponseDTO assignProject(Long employeeId, Long projectId) {
+        Employee employee = findByIdOrThrow(employeeId);
+        Project project = projectRepository.findById(projectId).orElseThrow(()
+                -> new ProjectNotFoundException(projectId));
+
+        employee.addProject(project);
+
+        Employee updated = employeeRepository.save(employee);
+
+        return employeeMapper.toDTO(updated);
+    }
 }

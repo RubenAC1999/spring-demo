@@ -50,4 +50,14 @@ public class Employee {
         this.email = email;
         this.position = position;
     }
+
+    public void addProject(Project project) {
+        this.projects.add(project);
+        project.getEmployees().add(this);
+    }
+
+    public void removeProject(Project project) {
+        this.projects.remove(project);
+        project.getEmployees().remove(this);
+    }
 }
