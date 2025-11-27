@@ -5,6 +5,7 @@ import com.example.demoPersonal.dto.task.TaskResponseDTO;
 import com.example.demoPersonal.entity.enums.Status;
 import com.example.demoPersonal.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,8 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponseDTO>> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
+    public ResponseEntity<List<TaskResponseDTO>> getAllTasks(Pageable pageable) {
+        return ResponseEntity.ok(taskService.getAllTasks(pageable));
     }
 
     @GetMapping("/{id}")
@@ -55,19 +56,19 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable Long id, @RequestParam @Valid TaskRequestDTO dto) {
+    public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable Long id, @RequestBody @Valid TaskRequestDTO dto) {
         return ResponseEntity.ok(taskService.updateTask(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeTask(Long id) {
+    public ResponseEntity<Void> removeTask(@PathVariable Long id) {
         taskService.removeTask(id);
 
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/assign/{employeeId}")
-    public ResponseEntity<TaskResponseDTO> assignTask(@PathVariable Long id, Long employeeId) {
+    public ResponseEntity<TaskResponseDTO> assignTask(@PathVariable Long id, @PathVariable Long employeeId) {
         return ResponseEntity.ok(taskService.assignTask(id, employeeId));
     }
 

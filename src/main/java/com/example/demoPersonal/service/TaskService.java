@@ -13,6 +13,7 @@ import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
 import com.example.demoPersonal.repository.TaskRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,8 +68,8 @@ public class TaskService {
         return taskRepository.findByEmployeeIsNull().stream().map(taskMapper::toDTO).toList();
     }
 
-    public List<TaskResponseDTO> getAllTasks() {
-        return taskRepository.findAll().stream().map(taskMapper::toDTO).toList();
+    public List<TaskResponseDTO> getAllTasks(Pageable pageable) {
+        return taskRepository.findAll(pageable).stream().map(taskMapper::toDTO).toList();
     }
 
     public TaskResponseDTO updateTask(Long id, TaskRequestDTO dto) {

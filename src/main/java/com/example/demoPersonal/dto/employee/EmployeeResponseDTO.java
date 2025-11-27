@@ -5,16 +5,10 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class EmployeeResponseDTO {
-    @Setter(AccessLevel.NONE)
-    private Long id;
-
-    private String email;
-    private String name;
-    private Position position;
-    private List<Long> projects_id;
-}
+public record EmployeeResponseDTO (
+    @Setter(AccessLevel.NONE) Long id,
+     String email,
+     String name,
+     Position position,
+     List<Long> projects_id
+) {}

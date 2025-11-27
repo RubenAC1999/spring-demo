@@ -4,18 +4,14 @@ import com.example.demoPersonal.entity.enums.Status;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class TaskResponseDTO {
+public record TaskResponseDTO (
     @Setter(AccessLevel.NONE)
-    private Long id;
+    Long id,
 
-    private String description;
-    private Status status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Long employeeId;
-    private Long projectId;
-}
+    String description,
+    Status status,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+    Long employeeId,
+    Long projectId
+) {}

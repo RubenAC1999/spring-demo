@@ -6,13 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ProjectRequestDTO {
-
+public record ProjectRequestDTO(
     @NotBlank(message = "Name is required")
-    private String name;
-
-}
+    String name
+) {}

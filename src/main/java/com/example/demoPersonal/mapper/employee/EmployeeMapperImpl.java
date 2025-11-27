@@ -26,8 +26,8 @@ public class EmployeeMapperImpl implements EmployeeMapper {
     @Override
     public Employee toEntity(EmployeeRequestDTO dto) {
         return new Employee(
-                dto.getName(),
-                dto.getEmail(),
-                dto.getPosition());
+                dto.name(),
+                dto.email(),
+                dto.position());
     }
 }

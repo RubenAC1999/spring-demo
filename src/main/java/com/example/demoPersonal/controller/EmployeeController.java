@@ -6,6 +6,7 @@ import com.example.demoPersonal.dto.task.TaskResponseDTO;
 import com.example.demoPersonal.entity.enums.Position;
 import com.example.demoPersonal.service.EmployeeService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,8 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
-       return ResponseEntity.ok(employeeService.getAllEmployees());
+    public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees(Pageable pageable) {
+       return ResponseEntity.ok(employeeService.getAllEmployees(pageable));
     }
 
     @GetMapping("/{id}")
@@ -73,8 +74,13 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeeTasks(id));
     }
 
-    @PutMapping("/{id}/projects/{projectId}")
+    @PutMapping("/{id}/assignProject/{projectId}")
     public ResponseEntity<EmployeeResponseDTO> assignProject(@PathVariable Long id, @PathVariable Long projectId) {
         return ResponseEntity.ok(employeeService.assignProject(id, projectId));
+    }
+
+    @PutMapping("/{id}/unassignProject/{projectId}")
+    public ResponseEntity<EmployeeResponseDTO> unassignProject(@PathVariable Long id, @PathVariable Long projectId) {
+        return ResponseEntity.ok(employeeService.unassignProject(id, projectId));
     }
 }

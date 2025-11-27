@@ -18,7 +18,7 @@ public class TaskMapperImpl implements TaskMapper {
                 task.getStatus(),
                 task.getCreatedAt(),
                 task.getUpdatedAt(),
-                task.getEmployee().getId(),
+                task.getEmployee() == null ? null : task.getEmployee().getId(),
                 task.getProject().getId()
                 );
     }
@@ -26,7 +26,7 @@ public class TaskMapperImpl implements TaskMapper {
     @Override
     public Task toEntity(TaskRequestDTO dto, Project project) {
         return new Task(
-                dto.getDescription(),
+                dto.description(),
                 project
         );
     }

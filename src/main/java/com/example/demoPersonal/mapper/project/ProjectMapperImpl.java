@@ -18,7 +18,7 @@ public class ProjectMapperImpl implements ProjectMapper {
     @Override
     public Project toEntity(ProjectRequestDTO dto) {
         return new Project(
-                dto.getName()
+                dto.name()
         );
     }
 }

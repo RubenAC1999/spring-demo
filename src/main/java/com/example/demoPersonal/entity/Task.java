@@ -1,6 +1,7 @@
 package com.example.demoPersonal.entity;
 
 import com.example.demoPersonal.entity.enums.Status;
+import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

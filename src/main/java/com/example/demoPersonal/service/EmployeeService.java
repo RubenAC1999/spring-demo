@@ -14,6 +14,7 @@ import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
 import com.example.demoPersonal.repository.TaskRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,8 +69,8 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public List<EmployeeResponseDTO> getAllEmployees() {
-        return employeeRepository.findAll().stream().map(employeeMapper::toDTO).toList();
+    public List<EmployeeResponseDTO> getAllEmployees(Pageable pageable) {
+        return employeeRepository.findAll(pageable).stream().map(employeeMapper::toDTO).toList();
     }
 
     public EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO dto) {
@@ -133,5 +134,15 @@ public class EmployeeService {
         Employee updated = employeeRepository.save(employee);
 
         return employeeMapper.toDTO(updated);
+    }
+
+    public EmployeeResponseDTO unassignProject(Long employeeId, Long projectId) {
+        Employee employee = findByIdOrThrow(employeeId);
+        Project project = projectRepository.findById(projectId).orElseThrow(() ->
+                new ProjectNotFoundException(projectId));
+
+        employee.removeProject(project);
+
+        return employeeMapper.toDTO(employee);
     }
 }
