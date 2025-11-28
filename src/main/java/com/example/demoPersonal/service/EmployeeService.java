@@ -15,6 +15,7 @@ import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
 import com.example.demoPersonal.repository.TaskRepository;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +31,17 @@ public class EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final TaskMapper taskMapper;
 
+    private final PasswordEncoder passwordEncoder;
+
     public EmployeeService(EmployeeRepository employeeRepository, TaskRepository taskRepository,
-                           ProjectRepository projectRepository, EmployeeMapper employeeMapper, TaskMapper taskMapper) {
+                           ProjectRepository projectRepository, EmployeeMapper employeeMapper, TaskMapper taskMapper,
+                           PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.employeeMapper = employeeMapper;
         this.taskMapper = taskMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -45,16 +50,17 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO createEmployee(EmployeeRequestDTO dto) {
-        String email = dto.getEmail().toLowerCase();
+        String email = dto.email().toLowerCase();
 
         if (employeeRepository.existsByEmail(email)) {
             throw new EmployeeExistsException(email);
         }
 
         Employee employee = new Employee();
-        employee.setName(dto.getName());
+        employee.setName(dto.name());
         employee.setEmail(email);
-        employee.setPosition(dto.getPosition());
+        employee.setPassword(passwordEncoder.encode(dto.password()));
+        employee.setPosition(dto.position());
 
         Employee saved = employeeRepository.save(employee);
 
@@ -76,15 +82,15 @@ public class EmployeeService {
     public EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO dto) {
         Employee employee = findByIdOrThrow(id);
 
-        String email = dto.getEmail().toLowerCase();
+        String email = dto.email().toLowerCase();
 
         if (employeeRepository.existsByEmail(email) && !email.equalsIgnoreCase(employee.getEmail())) {
             throw new EmployeeExistsException(email);
         }
 
-        employee.setName(dto.getName());
+        employee.setName(dto.name());
         employee.setEmail(email);
-        employee.setPosition(dto.getPosition());
+        employee.setPosition(dto.position());
 
         Employee updated = employeeRepository.save(employee);
 

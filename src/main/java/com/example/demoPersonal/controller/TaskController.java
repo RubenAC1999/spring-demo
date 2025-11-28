@@ -50,7 +50,7 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> createTask(@RequestBody @Valid TaskRequestDTO dto) {
         TaskResponseDTO task = taskService.createTask(dto);
 
-        URI location = URI.create("/tasks/" + task.getId());
+        URI location = URI.create("/tasks/" + task.id());
 
         return ResponseEntity.created(location).body(task);
     }

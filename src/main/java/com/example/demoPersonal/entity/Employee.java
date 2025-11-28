@@ -23,6 +23,9 @@ public class Employee {
     private String name;
 
     @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING)
@@ -45,9 +48,10 @@ public class Employee {
     )
     private List<Project> projects = new ArrayList<>();
 
-    public Employee(String name, String email, Position position) {
+    public Employee(String name, String email, String password, Position position) {
         this.name = name;
         this.email = email;
+        this.password = password;
         this.position = position;
     }
 

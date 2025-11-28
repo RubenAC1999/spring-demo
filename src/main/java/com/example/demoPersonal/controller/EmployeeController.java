@@ -51,7 +51,7 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponseDTO> createEmployee(@RequestBody @Valid EmployeeRequestDTO dto) {
         EmployeeResponseDTO created = employeeService.createEmployee(dto);
 
-        URI location = URI.create("/employees/" + created.getId());
+        URI location = URI.create("/employees/" + created.id());
 
         return ResponseEntity.created(location).body(created);
     }

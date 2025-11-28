@@ -4,9 +4,7 @@ import com.example.demoPersonal.dto.employee.EmployeeResponseDTO;
 import com.example.demoPersonal.dto.project.ProjectRequestDTO;
 import com.example.demoPersonal.dto.project.ProjectResponseDTO;
 import com.example.demoPersonal.dto.task.TaskResponseDTO;
-import com.example.demoPersonal.entity.Employee;
 import com.example.demoPersonal.entity.Project;
-import com.example.demoPersonal.entity.Task;
 import com.example.demoPersonal.exception.ProjectNotFoundException;
 import com.example.demoPersonal.mapper.employee.EmployeeMapper;
 import com.example.demoPersonal.mapper.project.ProjectMapper;
@@ -38,7 +36,7 @@ public class ProjectService {
 
     public ProjectResponseDTO createProject(ProjectRequestDTO dto) {
         Project project = new Project(
-                dto.getName()
+                dto.name()
         );
 
         Project saved = projectRepository.save(project);
@@ -63,7 +61,7 @@ public class ProjectService {
     public ProjectResponseDTO updateProject(Long id, ProjectRequestDTO dto) {
         Project project = findProjectOrThrow(id);
 
-        project.setName(dto.getName());
+        project.setName(dto.name());
 
         Project updated = projectRepository.save(project);
 

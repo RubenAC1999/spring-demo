@@ -39,11 +39,11 @@ public class TaskService {
     }
 
     public TaskResponseDTO createTask(TaskRequestDTO dto) {
-        Project project = projectRepository.findById(dto.getProjectId()).orElseThrow(() ->
-                new ProjectNotFoundException(dto.getProjectId()));
+        Project project = projectRepository.findById(dto.projectId()).orElseThrow(() ->
+                new ProjectNotFoundException(dto.projectId()));
 
         Task task = new Task(
-                dto.getDescription(),
+                dto.description(),
                 project
         );
 
@@ -74,11 +74,11 @@ public class TaskService {
 
     public TaskResponseDTO updateTask(Long id, TaskRequestDTO dto) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        Project project = projectRepository.findById(dto.getProjectId()).orElseThrow(() ->
-                new ProjectNotFoundException(dto.getProjectId()));
+        Project project = projectRepository.findById(dto.projectId()).orElseThrow(() ->
+                new ProjectNotFoundException(dto.projectId()));
 
-        task.setDescription(dto.getDescription());
-        task.setStatus(dto.getStatus());
+        task.setDescription(dto.description());
+        task.setStatus(dto.status());
         task.setProject(project);
 
         Task updated = taskRepository.save(task);

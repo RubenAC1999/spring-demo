@@ -13,5 +13,8 @@ public record EmployeeRequestDTO (
         String email,
 
         @NotNull(message = "Position cannot be null")
-        Position position
+        Position position,
+
+        @NotNull(message = "Password is required")
+        String password
 ) {}

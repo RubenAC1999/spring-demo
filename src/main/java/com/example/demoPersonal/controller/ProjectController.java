@@ -40,7 +40,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDTO> createProject(@RequestBody @Valid ProjectRequestDTO dto) {
         ProjectResponseDTO created = projectService.createProject(dto);
 
-        URI location = URI.create("/projects/" + created.getId());
+        URI location = URI.create("/projects/" + created.id());
 
         return ResponseEntity.created(location).body(created);
     }

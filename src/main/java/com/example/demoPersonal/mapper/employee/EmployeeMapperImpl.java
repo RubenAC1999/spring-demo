@@ -28,6 +28,7 @@ public class EmployeeMapperImpl implements EmployeeMapper {
         return new Employee(
                 dto.name(),
                 dto.email(),
+                dto.password(),
                 dto.position());
     }
 }
