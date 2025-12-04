@@ -14,6 +14,8 @@ import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
 import com.example.demoPersonal.repository.TaskRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,8 @@ public class EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final TaskMapper taskMapper;
 
+    private static final Logger log = LoggerFactory.getLogger(EmployeeService.class);
+
     private final PasswordEncoder passwordEncoder;
 
     public EmployeeService(EmployeeRepository employeeRepository, TaskRepository taskRepository,
@@ -46,13 +50,18 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     private Employee findByIdOrThrow(Long id) {
+        log.debug("Searching employee with id = {}", id);
         return employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
     public EmployeeResponseDTO createEmployee(EmployeeRequestDTO dto) {
         String email = dto.email().toLowerCase();
 
+        log.info("Creating employee with email = {}", email);
+
         if (employeeRepository.existsByEmail(email)) {
+            log.warn("Employee with email={} already exists", email);
+
             throw new EmployeeExistsException(email);
         }
 
@@ -63,6 +72,8 @@ public class EmployeeService {
         employee.setPosition(dto.position());
 
         Employee saved = employeeRepository.save(employee);
+
+        log.info("New employee created with email={}", saved.getEmail());
 
         return employeeMapper.toDTO(saved);
     }
@@ -84,7 +95,11 @@ public class EmployeeService {
 
         String email = dto.email().toLowerCase();
 
+        log.info("Updating employee with email={}", dto.email());
+
         if (employeeRepository.existsByEmail(email) && !email.equalsIgnoreCase(employee.getEmail())) {
+            log.warn("Employee with email={} already exists", email);
+
             throw new EmployeeExistsException(email);
         }
 
@@ -94,6 +109,8 @@ public class EmployeeService {
 
         Employee updated = employeeRepository.save(employee);
 
+        log.info("Employee updated successfully with email={}", updated.getEmail());
+
         return employeeMapper.toDTO(updated);
     }
 
@@ -101,6 +118,7 @@ public class EmployeeService {
         Employee employee = findByIdOrThrow(id);
 
         employeeRepository.delete(employee);
+        log.info("Employee with id={} removed", id);
     }
 
     @Transactional(readOnly = true)
@@ -131,6 +149,8 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO assignProject(Long employeeId, Long projectId) {
+        log.info("Assigning project {} to employee {}", projectId, employeeId);
+
         Employee employee = findByIdOrThrow(employeeId);
         Project project = projectRepository.findById(projectId).orElseThrow(()
                 -> new ProjectNotFoundException(projectId));
@@ -139,16 +159,21 @@ public class EmployeeService {
 
         Employee updated = employeeRepository.save(employee);
 
+        log.info("Project {} assigned to employee {}", project.getName(), updated.getId());
+
         return employeeMapper.toDTO(updated);
     }
 
     public EmployeeResponseDTO unassignProject(Long employeeId, Long projectId) {
+        log.info("Unassigning project {} to employee {}", projectId, employeeId);
+
         Employee employee = findByIdOrThrow(employeeId);
         Project project = projectRepository.findById(projectId).orElseThrow(() ->
                 new ProjectNotFoundException(projectId));
 
         employee.removeProject(project);
 
+        log.info("Project {} unassigned to employee {}", project.getName(), employeeId);
         return employeeMapper.toDTO(employee);
     }
 }

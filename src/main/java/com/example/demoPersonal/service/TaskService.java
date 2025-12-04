@@ -13,6 +13,8 @@ import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
 import com.example.demoPersonal.repository.TaskRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,8 @@ public class TaskService {
 
     private final TaskMapper taskMapper;
 
+    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
+
     public TaskService(TaskRepository taskRepository, ProjectRepository projectRepository,
                        EmployeeRepository employeeRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
@@ -35,6 +39,7 @@ public class TaskService {
     }
 
     private Task findTaskOrThrow(Long id) {
+        log.debug("Searching task with id = {}", id);
         return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
     }
 
@@ -48,6 +53,7 @@ public class TaskService {
         );
 
         Task saved = taskRepository.save(task);
+        log.info("Task {} (id = {}) created successfully.", saved.getDescription(), saved.getId());
         return taskMapper.toDTO(saved);
     }
 
@@ -83,6 +89,8 @@ public class TaskService {
 
         Task updated = taskRepository.save(task);
 
+        log.info("Task {} (id = {}) updated successfully.", updated.getDescription(), updated.getId());
+
         return taskMapper.toDTO(updated);
     }
 
@@ -90,9 +98,13 @@ public class TaskService {
         Task task = findTaskOrThrow(id);
 
         taskRepository.delete(task);
+
+        log.info("Task {} (id = {}) removed successfully", task.getDescription(), task.getId());
     }
 
     public TaskResponseDTO assignTask(Long taskId, Long employeeId) {
+        log.info("Assigning task {} to employee {}", taskId, employeeId);
+
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
@@ -102,15 +114,21 @@ public class TaskService {
 
         Task assigned = taskRepository.save(task);
 
+        log.info("Task {} (id = {}) assigned successfully to {} (id = {}).",
+                assigned.getDescription(), assigned.getId(), employee.getName(), employee.getId());
+
         return taskMapper.toDTO(assigned);
     }
 
     public TaskResponseDTO unassingTask(Long id) {
+        log.info("Unassigning task {}", id);
         Task task = findTaskOrThrow(id);
 
         task.setEmployee(null);
 
         Task unassigned = taskRepository.save(task);
+
+        log.info("Task {} (id = {}) unassigned successfully.", unassigned.getDescription(), unassigned.getId());
 
         return taskMapper.toDTO(unassigned);
     }

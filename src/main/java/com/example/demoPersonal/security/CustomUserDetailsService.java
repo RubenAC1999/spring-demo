@@ -1,4 +1,4 @@
-package com.example.demoPersonal.config;
+package com.example.demoPersonal.security;
 
 import com.example.demoPersonal.entity.Employee;
 import com.example.demoPersonal.repository.EmployeeRepository;
@@ -15,7 +15,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetailsService(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

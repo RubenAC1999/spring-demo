@@ -1,9 +1,8 @@
-package com.example.demoPersonal.config;
+package com.example.demoPersonal.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +18,7 @@ public class JwtService {
 
     // Esto estaría mejor en variables de entorno o en application.properties.
     private static final String SECRET_KEY = "K3b9FQz3pL0m18s7XvN2cR4yT6wZ8aB@";
-    private static final long TOKEN_EXPIRATION = 1000 * 60 * 60 * 24;
+    private static final long TOKEN_EXPIRATION = 1000 * 60 * 60 * 24; // Ms * s * m * h -> 24 horas.
 
     private Key getSigningKey() {
         byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
@@ -50,14 +49,14 @@ public class JwtService {
         return extractAllClaims(token).getSubject();
     }
 
+    private boolean isTokenExpired(String token) {
+        return extractAllClaims(token).getExpiration().before(new Date());
+    }
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
         String username = extractUsername(token);
 
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractAllClaims(token).getExpiration().before(new Date());
     }
 
     private Claims extractAllClaims(String token) {

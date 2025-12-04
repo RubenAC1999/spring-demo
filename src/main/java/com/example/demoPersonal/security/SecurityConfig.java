@@ -1,4 +1,4 @@
-package com.example.demoPersonal.config;
+package com.example.demoPersonal.security;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;

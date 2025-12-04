@@ -1,6 +1,8 @@
 package com.example.demoPersonal.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(EmployeeNotFoundException.class)
     public ResponseEntity<ApiError> handleEmployeeNotFound(EmployeeNotFoundException exception,
@@ -21,6 +25,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
+        log.warn("Employee not found");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 

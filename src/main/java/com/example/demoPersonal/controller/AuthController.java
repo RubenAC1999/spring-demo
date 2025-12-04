@@ -1,9 +1,11 @@
 package com.example.demoPersonal.controller;
 
-import com.example.demoPersonal.config.CustomUserDetailsService;
-import com.example.demoPersonal.config.JwtService;
+import com.example.demoPersonal.security.CustomUserDetailsService;
+import com.example.demoPersonal.security.JwtService;
 import com.example.demoPersonal.dto.login.AuthResponseDTO;
 import com.example.demoPersonal.dto.login.LoginRequestDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,8 @@ public class AuthController {
     private final CustomUserDetailsService userDetailsService;
     private final JwtService jwtService;
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     public AuthController(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService,
                           JwtService jwtService) {
         this.authenticationManager = authenticationManager;
@@ -31,6 +35,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO dto) {
+        log.info("Login attempt for {}", dto.email());
+
         Authentication authToken = new UsernamePasswordAuthenticationToken(
                 dto.email(),
                 dto.password());
@@ -40,6 +46,7 @@ public class AuthController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(dto.email());
         String jwt = jwtService.generateToken(userDetails);
 
+        log.info("Login successful for {}", dto.email());
         return ResponseEntity.ok(new AuthResponseDTO(jwt));
     }
 

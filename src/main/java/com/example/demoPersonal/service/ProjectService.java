@@ -10,6 +10,8 @@ import com.example.demoPersonal.mapper.employee.EmployeeMapper;
 import com.example.demoPersonal.mapper.project.ProjectMapper;
 import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.ProjectRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,8 @@ public class ProjectService {
     private final TaskMapper taskMapper;
     private final EmployeeMapper employeeMapper;
 
+    private static final Logger log = LoggerFactory.getLogger(ProjectService.class);
+
     public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper, TaskMapper taskMapper,
                           EmployeeMapper employeeMapper) {
         this.projectRepository = projectRepository;
@@ -31,6 +35,8 @@ public class ProjectService {
     }
 
     private Project findProjectOrThrow(Long id) {
+        log.debug("Searching project with id = {}", id);
+
         return projectRepository.findById(id).orElseThrow(() -> new ProjectNotFoundException(id));
     }
 
@@ -41,6 +47,7 @@ public class ProjectService {
 
         Project saved = projectRepository.save(project);
 
+        log.info("Project {} (id={}) created successfully.", saved.getName(), saved.getId());
         return projectMapper.toDTO(saved);
     }
 
@@ -65,6 +72,8 @@ public class ProjectService {
 
         Project updated = projectRepository.save(project);
 
+        log.info("Project {} (id={}) updated successfully.", updated.getName(), updated.getId());
+
         return projectMapper.toDTO(updated);
     }
 
@@ -72,6 +81,8 @@ public class ProjectService {
         Project project = findProjectOrThrow(id);
 
         projectRepository.delete(project);
+
+        log.info("Project {} (id={}) removed successfully.", project.getName(), project.getId());
     }
 
     public List<TaskResponseDTO> getProjectTasks(Long id) {
