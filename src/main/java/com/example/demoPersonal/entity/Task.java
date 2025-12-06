@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "tasks")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(nullable = false)
@@ -29,10 +29,10 @@ public class Task {
     @Column(nullable = false)
     private Status status = Status.TODO;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    // FetchType EAGER porque es una relación Many to One y con un atributo que siempre se va a mostrar.
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(
             name = "employee_id",
-            nullable = true,
             foreignKey = @ForeignKey(name = "fk_task_employee")
     )
     private Employee employee;
@@ -52,6 +52,7 @@ public class Task {
 
     @LastModifiedDate
     @Setter(AccessLevel.NONE)
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
 

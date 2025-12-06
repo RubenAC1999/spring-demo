@@ -73,7 +73,7 @@ public class EmployeeService {
 
         Employee saved = employeeRepository.save(employee);
 
-        log.info("New employee created with email={}", saved.getEmail());
+        log.info("New employee created with email = {}", saved.getEmail());
 
         return employeeMapper.toDTO(saved);
     }
@@ -95,10 +95,9 @@ public class EmployeeService {
 
         String email = dto.email().toLowerCase();
 
-        log.info("Updating employee with email={}", dto.email());
-
+        log.info("Updating employee with email = {}", dto.email());
         if (employeeRepository.existsByEmail(email) && !email.equalsIgnoreCase(employee.getEmail())) {
-            log.warn("Employee with email={} already exists", email);
+            log.warn("Employee with email = {} already exists", email);
 
             throw new EmployeeExistsException(email);
         }
