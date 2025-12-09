@@ -108,7 +108,7 @@ public class EmployeeService {
 
         Employee updated = employeeRepository.save(employee);
 
-        log.info("Employee updated successfully with email={}", updated.getEmail());
+        log.info("Employee updated successfully with email={}", email);
 
         return employeeMapper.toDTO(updated);
     }

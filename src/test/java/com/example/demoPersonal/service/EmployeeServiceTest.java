@@ -285,4 +285,125 @@ import static org.postgresql.hostchooser.HostRequirement.any;
         verify(employeeRepository).save(any(Employee.class));
         verify(employeeMapper).toDTO(updated);
     }
+
+    @Test
+    void updateEmployee_shouldReturnException_employeeNotExists() {
+        // GIVEN
+        Long employeeId = 99L;
+
+        EmployeeRequestDTO dto = new EmployeeRequestDTO(
+                "Updated",
+                "updated@gmail.com",
+                Position.DEVELOPER,
+                "updated123."
+        );
+
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+
+        // WHEN - THEN
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.updateEmployee(employeeId, dto));
+
+        verify(employeeRepository).findById(employeeId);
+    }
+
+    @Test
+    void updateEmployee_shouldReturnException_sameEmailAsOtherEmployee() {
+        // GIVEN
+        Long employeeId = 1L;
+        Long otherEmployeeId = 2L;
+
+        Employee toUpdate = new Employee();
+        toUpdate.setId(employeeId);
+        toUpdate.setName("toUpdate");
+        toUpdate.setEmail("email@gmail.com");
+        toUpdate.setPosition(Position.DEVELOPER);
+        toUpdate.setPassword("abc123.");
+
+        EmployeeRequestDTO dto = new EmployeeRequestDTO(
+                "Updated",
+                "updatedEmail@gmail.com",
+                toUpdate.getPosition(),
+                "encoded-password"
+        );
+
+        String normalizedEmail = dto.email().toLowerCase();
+
+        Employee employeeAlreadyExists = new Employee();
+        employeeAlreadyExists.setId(otherEmployeeId);
+        employeeAlreadyExists.setName("Exists");
+        employeeAlreadyExists.setEmail(normalizedEmail);
+        employeeAlreadyExists.setPosition(Position.DATA_ENGINEER);
+
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(toUpdate));
+        when(employeeRepository.existsByEmail(normalizedEmail)).thenReturn(true);
+
+        // WHEN
+        assertThrows(EmployeeExistsException.class, () -> employeeService.updateEmployee(employeeId, dto));
+
+        // THEN
+        verify(employeeRepository).findById(employeeId);
+        verify(employeeRepository).existsByEmail(normalizedEmail);
+    }
+
+    @Test
+    void assignProject_shouldReturnDTO_whenDataIsValid() {
+        // GIVEN
+        Long employeeId = 1L;
+
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setName("Test");
+        employee.setEmail("test@gmail.com");
+        employee.setPosition(Position.DEVELOPER);
+        employee.setPassword("abc123.");
+
+        Long projectId = 1L;
+
+        Project project = new Project();
+        project.setId(projectId);
+        project.setName("ProjectTest");
+
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        Employee updated = new Employee();
+        updated.setId(employeeId);
+        updated.setName(employee.getName());
+        updated.setEmail(employee.getEmail());
+        updated.setPosition(employee.getPosition());
+        updated.addProject(project);
+
+        List<Long> projectIds = updated.getProjects().stream().map(Project::getId).toList();
+
+
+        when(employeeRepository.save(employee)).thenReturn(updated);
+
+        EmployeeResponseDTO mappedToDTO = new EmployeeResponseDTO(
+                updated.getId(),
+                updated.getEmail(),
+                updated.getName(),
+                updated.getPosition(),
+                updated.getProjects().stream().map(Project::getId).toList()
+        );
+
+        when(employeeMapper.toDTO(updated)).thenReturn(mappedToDTO);
+
+        // WHEN
+        EmployeeResponseDTO result = employeeService.assignProject(employeeId, projectId);
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(employeeId, result.id());
+        assertEquals("Test", result.name());
+        assertEquals("test@gmail.com", result.email());
+        assertEquals(updated.getPosition(), result.position());
+        assertEquals(projectIds, result.projects_id());
+
+        verify(employeeRepository).findById(employeeId);
+        verify(projectRepository).findById(projectId);
+        verify(employeeRepository).save(employee);
+        verify(employeeMapper).toDTO(updated);
+    }
+
+
 }

@@ -56,8 +56,10 @@ public class Employee {
     }
 
     public void addProject(Project project) {
-        this.projects.add(project);
-        project.getEmployees().add(this);
+        if(!this.projects.contains(project)) {
+            this.projects.add(project);
+            project.getEmployees().add(this);
+        }
     }
 
     public void removeProject(Project project) {
