@@ -172,7 +172,9 @@ public class EmployeeService {
 
         employee.removeProject(project);
 
+        Employee updated = employeeRepository.save(employee);
+
         log.info("Project {} unassigned to employee {}", project.getName(), employeeId);
-        return employeeMapper.toDTO(employee);
+        return employeeMapper.toDTO(updated);
     }
 }

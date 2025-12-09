@@ -3,6 +3,7 @@ package com.example.demoPersonal.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,12 +17,14 @@ import java.util.Map;
 @Component
 public class JwtService {
 
-    // Esto estaría mejor en variables de entorno o en application.properties.
-    private static final String SECRET_KEY = "K3b9FQz3pL0m18s7XvN2cR4yT6wZ8aB@";
-    private static final long TOKEN_EXPIRATION = 1000 * 60 * 60 * 24; // Ms * s * m * h -> 24 horas.
+    // Esto estaría mejor en variables de entorno o en application.properties. 32 bytes mínimo, aleatorio y Base64.
+    private static final String SECRET_KEY = "YzJkMzFhODQxZGIwNTM2OTUyYzU1ZDQ0ZjQ2NzkwYzdhMzQ1OTFmZjMyODU0ZjQ2";
+
+    // 24 horas, para buenas prácticas se suele usar 5 - 15 minutos.
+    private static final long TOKEN_EXPIRATION = 1000 * 60 * 60 * 24;
 
     private Key getSigningKey() {
-        byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
 
         return Keys.hmacShaKeyFor(keyBytes);
     }

@@ -7,6 +7,7 @@ import com.example.demoPersonal.entity.Project;
 import com.example.demoPersonal.entity.enums.Position;
 import com.example.demoPersonal.exception.EmployeeExistsException;
 import com.example.demoPersonal.exception.EmployeeNotFoundException;
+import com.example.demoPersonal.exception.ProjectNotFoundException;
 import com.example.demoPersonal.mapper.employee.EmployeeMapper;
 import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
@@ -17,8 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -27,7 +27,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.postgresql.hostchooser.HostRequirement.any;
 
 @ExtendWith(MockitoExtension.class)
  class EmployeeServiceTest {
@@ -403,6 +402,150 @@ import static org.postgresql.hostchooser.HostRequirement.any;
         verify(projectRepository).findById(projectId);
         verify(employeeRepository).save(employee);
         verify(employeeMapper).toDTO(updated);
+    }
+
+    @Test
+    void assignProject_shouldThrowException_whenEmployeeNotExists() {
+        // GIVEN
+        Long employeeId = 99L;
+        Long projectId = 1L;
+
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+
+        // WHEN - THEN
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.assignProject(employeeId, projectId));
+
+        verify(employeeRepository).findById(employeeId);
+        verify(projectRepository, never()).findById(any());
+        verify(employeeRepository, never()).save(any());
+        verify(employeeMapper, never()).toDTO(any());
+    }
+
+    @Test
+    void assignProject_shouldThrowException_whenProjectNotExists() {
+        // GIVEN
+        Long employeeId = 1L;
+        Long projectId = 99L;
+
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setName("Test");
+        employee.setEmail("test@gmail.com");
+        employee.setPosition(Position.DEVELOPER);
+        employee.setPassword("abc123.");
+
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+
+        // WHEN - THEN
+        assertThrows(ProjectNotFoundException.class, () -> employeeService.assignProject(employeeId, projectId));
+
+        verify(employeeRepository).findById(employeeId);
+        verify(projectRepository).findById(projectId);
+        verify(employeeRepository, never()).save(any());
+        verify(employeeMapper, never()).toDTO(any());
+    }
+
+    @Test
+    void unassignProject_shouldReturnDTO_whenDataIsValid() {
+        // GIVEN
+        Long employeeId = 1L;
+
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setName("Test");
+        employee.setEmail("test@gmail.com");
+        employee.setPosition(Position.DEVELOPER);
+        employee.setPassword("abc123.");
+
+        Long projectId = 1L;
+
+        Project project = new Project();
+        project.setId(projectId);
+        project.setName("ProjectTest");
+
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        Employee updated = new Employee();
+        updated.setId(employeeId);
+        updated.setName(employee.getName());
+        updated.setEmail(employee.getEmail());
+        updated.setPosition(employee.getPosition());
+        updated.removeProject(project);
+
+        List<Long> projectIds = updated.getProjects().stream().map(Project::getId).toList();
+
+
+        when(employeeRepository.save(employee)).thenReturn(updated);
+
+        EmployeeResponseDTO mappedToDTO = new EmployeeResponseDTO(
+                updated.getId(),
+                updated.getEmail(),
+                updated.getName(),
+                updated.getPosition(),
+                updated.getProjects().stream().map(Project::getId).toList()
+        );
+
+        when(employeeMapper.toDTO(updated)).thenReturn(mappedToDTO);
+
+        // WHEN
+        EmployeeResponseDTO result = employeeService.unassignProject(employeeId, projectId);
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(employeeId, result.id());
+        assertEquals("Test", result.name());
+        assertEquals("test@gmail.com", result.email());
+        assertEquals(updated.getPosition(), result.position());
+        assertEquals(projectIds, result.projects_id());
+
+        verify(employeeRepository).findById(employeeId);
+        verify(projectRepository).findById(projectId);
+        verify(employeeRepository).save(employee);
+        verify(employeeMapper).toDTO(updated);
+    }
+
+    @Test
+    void unassingProject_shouldThrowException_whenEmployeeNotExists() {
+        // GIVEN
+        Long employeeId = 99L;
+        Long projectId = 1L;
+
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+
+        // WHEN - THEN
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.unassignProject(employeeId, projectId));
+
+        verify(employeeRepository).findById(employeeId);
+        verify(projectRepository, never()).findById(any());
+        verify(employeeRepository, never()).save(any());
+        verify(employeeMapper, never()).toDTO(any());
+    }
+
+    @Test
+    void unassignProject_shouldThrowException_whenProjectNotExists() {
+        // GIVEN
+        Long employeeId = 1L;
+        Long projectId = 99L;
+
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setName("Test");
+        employee.setEmail("test@gmail.com");
+        employee.setPosition(Position.DEVELOPER);
+        employee.setPassword("abc123.");
+
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+
+        // WHEN - THEN
+        assertThrows(ProjectNotFoundException.class, () -> employeeService.unassignProject(employeeId, projectId));
+
+        verify(employeeRepository).findById(employeeId);
+        verify(projectRepository).findById(projectId);
+        verify(employeeRepository, never()).save(any());
+        verify(employeeMapper, never()).toDTO(any());
     }
 
 
