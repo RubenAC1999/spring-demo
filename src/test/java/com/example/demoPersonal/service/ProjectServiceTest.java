@@ -121,38 +121,5 @@ class ProjectServiceTest {
         verify(projectMapper, never()).toDTO(any(Project.class));
     }
 
-    void removeProject_shouldNotReturnNothing_whenProjectIsRemoved() {
-        // GIVEN
-        Long projectId = 1L;
-        Project project = new Project();
-        project.setId(projectId);
-        project.setName("Test");
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        // WHEN
-        projectService.removeProject(projectId);
-
-        // THEN
-        verify(projectRepository).findById(projectId);
-        verify(projectRepository).delete(project);
-    }
-
-    void removeProject_shouldThrowException_whenProjectNotExists() {
-        // GIVEN
-        Long projectId = 99L;
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-
-        // WHEN - THEN
-        assertThrows(ProjectNotFoundException.class, () -> projectService.removeProject(projectId));
-
-        verify(projectRepository).findById(projectId);
-        verify(projectRepository, never()).delete(any(Project.class));
-    }
-
-
-
-
 
 }
