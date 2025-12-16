@@ -1,6 +1,7 @@
 package com.example.demoPersonal.entity;
 
 import com.example.demoPersonal.entity.enums.Position;
+import com.example.demoPersonal.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +15,6 @@ import java.util.List;
 @Entity
 @Table(name = "employees")
 public class Employee {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,6 +31,10 @@ public class Employee {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Position position;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @OneToMany(
             mappedBy = "employee",

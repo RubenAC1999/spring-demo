@@ -1,9 +1,12 @@
 package com.example.demoPersonal.controller;
 
+import com.example.demoPersonal.dto.login.RegisterRequestDTO;
 import com.example.demoPersonal.security.CustomUserDetailsService;
 import com.example.demoPersonal.security.JwtService;
 import com.example.demoPersonal.dto.login.AuthResponseDTO;
 import com.example.demoPersonal.dto.login.LoginRequestDTO;
+import com.example.demoPersonal.service.AuthService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+    private final AuthService authService;
 
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
@@ -26,28 +30,23 @@ public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
-    public AuthController(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService,
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService,
                           JwtService jwtService) {
+        this.authService = authService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponseDTO> register(@RequestBody @Valid RegisterRequestDTO dto) {
+        return ResponseEntity.status(201).body(authService.register(dto));
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO dto) {
-        log.info("Login attempt for {}", dto.email());
-
-        Authentication authToken = new UsernamePasswordAuthenticationToken(
-                dto.email(),
-                dto.password());
-
-        authenticationManager.authenticate(authToken);
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(dto.email());
-        String jwt = jwtService.generateToken(userDetails);
-
-        log.info("Login successful for {}", dto.email());
-        return ResponseEntity.ok(new AuthResponseDTO(jwt));
+        return ResponseEntity.ok(authService.login(dto));
     }
 
 
