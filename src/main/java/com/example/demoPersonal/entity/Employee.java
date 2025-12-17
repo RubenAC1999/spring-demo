@@ -34,7 +34,7 @@ public class Employee {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private Role role = Role.ROLE_USER;
 
     @OneToMany(
             mappedBy = "employee",

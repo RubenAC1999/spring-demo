@@ -55,6 +55,7 @@ public class AuthService {
         employee.setName(dto.name());
         employee.setEmail(email);
         employee.setPassword(passwordEncoder.encode(dto.password()));
+        employee.setPosition(dto.position());
         employee.setRole(Role.ROLE_USER);
 
         Employee saved = employeeRepository.save(employee);

@@ -24,18 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
 
-    private final AuthenticationManager authenticationManager;
-    private final CustomUserDetailsService userDetailsService;
-    private final JwtService jwtService;
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
-    public AuthController(AuthService authService, AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService,
-                          JwtService jwtService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
-        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
