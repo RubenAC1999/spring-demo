@@ -25,11 +25,15 @@ This is my first project using Spring, developed with the purpose of learn backe
 
 - **JWT** authentication with Spring Security
 
+- Control access using roles (ROLE_USER, ROLE_ADMIN)
+
 - Logging strategy with SLF4J
 
 - Writing unit tests with JUnit + Mockito
 
 - Testing workflows using Postman
+
+- Database migrations with Flyway
 
 ---
 
@@ -48,6 +52,7 @@ This is my first project using Spring, developed with the purpose of learn backe
 - JPA/Hibernate (interact with the DB)
 - PostgreSQL (Relational DB)
 - JUnit and Mockito (Unit tests)
+- Flyway (DB Migrations)
 
 ---
 
@@ -70,7 +75,7 @@ spring:
 
     jpa:
       hibernate:
-        ddl-auto: update
+        ddl-auto: validate
 ```
 
 3. Compile the project
@@ -88,7 +93,8 @@ mvn spring-boot:run
 ## Usage
 ### Main endpoints
 - **Authorization**
-    - Generate JWT: POST /auth/login
+    - Register: POST /auth/register
+    - Log in: POST /auth/login
 
 - **Employees**
     - List all employees: GET /employees
@@ -102,6 +108,21 @@ mvn spring-boot:run
     - Unassign a project: PUT /employees/{id}/unassignProject/{projectId}
 
 - **Tasks**
+  - List all tasks: GET /tasks (Pageable)
+  - Obtain tasks:
+      - By ID: GET /tasks/{id}
+      - By description: GET /tasks/search-by-description?description="description"
+      - By status: GET /tasks/search-by-status?status=status
+      - unassigned: GET /tasks/search-unassigned
+    - Assign it to an employee: PUT /tasks/{id}/assign/{employeeId}
+
+- **Projects**
+  - List all projects: GET /projects
+  - Obtain projects:
+    - By ID: GET /projects/{id}
+    - By name: GET /projects/search?name="name"
+  - List project employees: GET /{id}/employees
+  - List project tasks: GET /{id}/tasks
 
 ## Project architecture (Layered)
 
@@ -135,18 +156,18 @@ src/main/java/com/example/demoPersonal
 - Unit tests for service layer (JUnit + Mockito)
 - API tested manually using Postman
 - Initial documentation and project setup
+- Implement flyway to manage db migrations
+- Implement roles and endpoint control access
 
 ### TO-DO
+- Create endpoint "self" (Employees with role "User" just can see their tasks, and their project unassigned tasks.)
+- Refactor ID and use UUID instead.
 - Controller layer tests (MockMvc)
 - Document API using OpenAPI/Swagger
 - Containerization with Docker
-- Improve README with new funcionalities
 
 ### Considerations
-- Register endpoint
-- New employee roles
 - CI Pipeline (GitHub Actions)
-- Database migrations (with Flyway)
 - Metrics and Monitoring
 - Deploy in cloud (AWS)
 
