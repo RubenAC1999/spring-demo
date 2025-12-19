@@ -75,6 +75,11 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeeTasks(id));
     }
 
+    @GetMapping("/me/tasks")
+    public ResponseEntity<List<TaskResponseDTO>> getMyTasks(Authentication authentication) {
+        return ResponseEntity.ok(employeeService.getMyTasks(authentication.getName()));
+    }
+
     @PutMapping("/{id}/assignProject/{projectId}")
     public ResponseEntity<EmployeeResponseDTO> assignProject(@PathVariable Long id, @PathVariable Long projectId) {
         return ResponseEntity.ok(employeeService.assignProject(id, projectId));

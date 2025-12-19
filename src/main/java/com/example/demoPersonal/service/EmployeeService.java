@@ -17,6 +17,7 @@ import com.example.demoPersonal.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -146,6 +147,17 @@ public class EmployeeService {
 
         return employee.getTasks().stream().map(taskMapper::toDTO).toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<TaskResponseDTO> getMyTasks(String email) {
+        String emailNormalized = email.toLowerCase();
+
+        Employee me = employeeRepository.findByEmail(emailNormalized)
+                .orElseThrow(() -> new EmployeeNotFoundException(emailNormalized));
+
+        return me.getTasks().stream().map(taskMapper::toDTO).toList();
+    }
+
 
     public EmployeeResponseDTO assignProject(Long employeeId, Long projectId) {
         log.info("Assigning project {} to employee {}", projectId, employeeId);
