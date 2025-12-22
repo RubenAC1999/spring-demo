@@ -29,11 +29,11 @@ This is my first project using Spring, developed with the purpose of learn backe
 
 - Logging strategy with SLF4J
 
-- Writing unit tests with JUnit + Mockito
+- Writing unit tests with **JUnit + Mockito**
 
-- Testing workflows using Postman
+- Testing workflows using **Postman**
 
-- Database migrations with Flyway
+- Database migrations with **Flyway**
 
 ---
 
