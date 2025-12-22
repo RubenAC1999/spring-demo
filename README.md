@@ -159,7 +159,7 @@ src/main/java/com/example/demoPersonal
 - Implement flyway to manage db migrations
 - Implement roles and endpoint control access
 - Create endpoint "self" (Employees with role "User" just can see their tasks, and their project unassigned tasks.)
-- - Refactor ID and use UUID instead.
+- Refactor ID and use UUID instead.
 
 ### TO-DO
 - Tests to new endpoints "self"
