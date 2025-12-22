@@ -158,10 +158,11 @@ src/main/java/com/example/demoPersonal
 - Initial documentation and project setup
 - Implement flyway to manage db migrations
 - Implement roles and endpoint control access
+- Create endpoint "self" (Employees with role "User" just can see their tasks, and their project unassigned tasks.)
+- - Refactor ID and use UUID instead.
 
 ### TO-DO
-- Create endpoint "self" (Employees with role "User" just can see their tasks, and their project unassigned tasks.)
-- Refactor ID and use UUID instead.
+- Tests to new endpoints "self"
 - Controller layer tests (MockMvc)
 - Document API using OpenAPI/Swagger
 - Containerization with Docker
