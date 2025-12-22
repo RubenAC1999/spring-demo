@@ -87,6 +87,16 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
+    public EmployeeResponseDTO getCurrentEmployee(String email) {
+        String normalizedEmail = email.toLowerCase();
+
+        Employee currentEmployee = employeeRepository.findByEmail(email)
+                .orElseThrow(() -> new EmployeeNotFoundException(email));
+
+        return employeeMapper.toDTO(currentEmployee);
+    }
+
+    @Transactional(readOnly = true)
     public List<EmployeeResponseDTO> getAllEmployees(Pageable pageable) {
         return employeeRepository.findAll(pageable).stream().map(employeeMapper::toDTO).toList();
     }
@@ -149,13 +159,13 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public List<TaskResponseDTO> getMyTasks(String email) {
+    public List<TaskResponseDTO> getCurrentEmployeeTasks(String email) {
         String emailNormalized = email.toLowerCase();
 
-        Employee me = employeeRepository.findByEmail(emailNormalized)
+        Employee currentEmployee = employeeRepository.findByEmail(emailNormalized)
                 .orElseThrow(() -> new EmployeeNotFoundException(emailNormalized));
 
-        return me.getTasks().stream().map(taskMapper::toDTO).toList();
+        return currentEmployee.getTasks().stream().map(taskMapper::toDTO).toList();
     }
 
 

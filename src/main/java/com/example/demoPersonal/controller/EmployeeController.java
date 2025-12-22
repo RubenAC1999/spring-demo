@@ -33,6 +33,11 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<EmployeeResponseDTO> getCurrentEmployee(Authentication authentication) {
+        return ResponseEntity.ok(employeeService.getCurrentEmployee(authentication.getName()));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<EmployeeResponseDTO> getEmployeeByEmail(@RequestParam String email) {
         return ResponseEntity.ok(employeeService.getEmployeeByEmail(email));
@@ -76,8 +81,8 @@ public class EmployeeController {
     }
 
     @GetMapping("/me/tasks")
-    public ResponseEntity<List<TaskResponseDTO>> getMyTasks(Authentication authentication) {
-        return ResponseEntity.ok(employeeService.getMyTasks(authentication.getName()));
+    public ResponseEntity<List<TaskResponseDTO>> getCurrentEmployeeTasks(Authentication authentication) {
+        return ResponseEntity.ok(employeeService.getCurrentEmployeeTasks(authentication.getName()));
     }
 
     @PutMapping("/{id}/assignProject/{projectId}")
