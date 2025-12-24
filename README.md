@@ -162,7 +162,6 @@ src/main/java/com/example/demoPersonal
 - Refactor ID and use UUID instead.
 
 ### TO-DO
-- Tests to new endpoints "self"
 - Controller layer tests (MockMvc)
 - Document API using OpenAPI/Swagger
 - Containerization with Docker
