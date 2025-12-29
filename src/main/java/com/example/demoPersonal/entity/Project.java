@@ -42,8 +42,4 @@ public class Project {
     @ManyToMany(mappedBy = "projects")
     private List<Employee> employees = new ArrayList<>();
 
-    public Project(String name) {
-        this.name = name;
-    }
-
 }

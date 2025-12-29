@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TaskService {
@@ -38,27 +39,26 @@ public class TaskService {
         this.taskMapper = taskMapper;
     }
 
-    private Task findTaskOrThrow(Long id) {
-        log.debug("Searching task with id = {}", id);
-        return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+    private Task findTaskOrThrow(UUID uuid) {
+        log.debug("Searching task with uuid = {}", uuid);
+        return taskRepository.findByUuid(uuid).orElseThrow(() -> new TaskNotFoundException(uuid));
     }
 
     public TaskResponseDTO createTask(TaskRequestDTO dto) {
-        Project project = projectRepository.findById(dto.projectId()).orElseThrow(() ->
-                new ProjectNotFoundException(dto.projectId()));
+        Project project = projectRepository.findByUuid(dto.projectUuid()).orElseThrow(() ->
+                new ProjectNotFoundException(dto.projectUuid()));
 
-        Task task = new Task(
-                dto.description(),
-                project
-        );
+        Task task = new Task();
+        task.setDescription(dto.description());
+        task.setProject(project);
 
         Task saved = taskRepository.save(task);
-        log.info("Task {} (id = {}) created successfully.", saved.getDescription(), saved.getId());
+        log.info("Task {} (uuid = {}) created successfully.", saved.getDescription(), saved.getUuid());
         return taskMapper.toDTO(saved);
     }
 
-    public TaskResponseDTO getTaskById(Long id) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+    public TaskResponseDTO getTaskByUuid(UUID uuid) {
+        Task task = taskRepository.findByUuid(uuid).orElseThrow(() -> new TaskNotFoundException(uuid));
 
         return taskMapper.toDTO(task);
     }
@@ -78,10 +78,10 @@ public class TaskService {
         return taskRepository.findAll(pageable).stream().map(taskMapper::toDTO).toList();
     }
 
-    public TaskResponseDTO updateTask(Long id, TaskRequestDTO dto) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        Project project = projectRepository.findById(dto.projectId()).orElseThrow(() ->
-                new ProjectNotFoundException(dto.projectId()));
+    public TaskResponseDTO updateTask(UUID uuid, TaskRequestDTO dto) {
+        Task task = taskRepository.findByUuid(uuid).orElseThrow(() -> new TaskNotFoundException(uuid));
+        Project project = projectRepository.findByUuid(dto.projectUuid()).orElseThrow(() ->
+                new ProjectNotFoundException(dto.projectUuid()));
 
         task.setDescription(dto.description());
         task.setStatus(dto.status());
@@ -89,46 +89,46 @@ public class TaskService {
 
         Task updated = taskRepository.save(task);
 
-        log.info("Task {} (id = {}) updated successfully.", updated.getDescription(), updated.getId());
+        log.info("Task {} (uuid = {}) updated successfully.", updated.getDescription(), updated.getUuid());
 
         return taskMapper.toDTO(updated);
     }
 
-    public void removeTask(Long id) {
-        Task task = findTaskOrThrow(id);
+    public void removeTask(UUID uuid) {
+        Task task = findTaskOrThrow(uuid);
 
         taskRepository.delete(task);
 
-        log.info("Task {} (id = {}) removed successfully", task.getDescription(), task.getId());
+        log.info("Task {} (uuid = {}) removed successfully", task.getDescription(), task.getUuid());
     }
 
-    public TaskResponseDTO assignTask(Long taskId, Long employeeId) {
-        log.info("Assigning task {} to employee {}", taskId, employeeId);
+    public TaskResponseDTO assignTask(UUID taskUuid, UUID employeeUuid) {
+        log.info("Assigning task {} to employee {}", taskUuid, employeeUuid);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
+        Employee employee = employeeRepository.findByUuid(employeeUuid)
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeUuid));
 
-        Task task = findTaskOrThrow(taskId);
+        Task task = findTaskOrThrow(taskUuid);
 
         task.setEmployee(employee);
 
         Task assigned = taskRepository.save(task);
 
-        log.info("Task {} (id = {}) assigned successfully to {} (id = {}).",
-                assigned.getDescription(), assigned.getId(), employee.getName(), employee.getId());
+        log.info("Task {} (uuid = {}) assigned successfully to {} (uuid = {}).",
+                assigned.getDescription(), assigned.getUuid(), employee.getName(), employee.getUuid());
 
         return taskMapper.toDTO(assigned);
     }
 
-    public TaskResponseDTO unassingTask(Long id) {
-        log.info("Unassigning task {}", id);
-        Task task = findTaskOrThrow(id);
+    public TaskResponseDTO unassingTask(UUID uuid) {
+        log.info("Unassigning task {}", uuid);
+        Task task = findTaskOrThrow(uuid);
 
         task.setEmployee(null);
 
         Task unassigned = taskRepository.save(task);
 
-        log.info("Task {} (id = {}) unassigned successfully.", unassigned.getDescription(), unassigned.getId());
+        log.info("Task {} (uuid = {}) unassigned successfully.", unassigned.getDescription(), unassigned.getUuid());
 
         return taskMapper.toDTO(unassigned);
     }

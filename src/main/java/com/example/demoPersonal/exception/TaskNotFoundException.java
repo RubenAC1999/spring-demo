@@ -1,7 +1,9 @@
 package com.example.demoPersonal.exception;
 
+import java.util.UUID;
+
 public class TaskNotFoundException extends RuntimeException {
-    public TaskNotFoundException(Long id) {
-        super("Error: Task with ID: " + id + " not found.");
+    public TaskNotFoundException(UUID uuid) {
+        super("Error: Task with UUID: " + uuid + " not found.");
     }
 }

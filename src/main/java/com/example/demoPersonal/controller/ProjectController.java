@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/projects")
@@ -26,9 +27,9 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getAllProjects());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable Long id) {
-        return ResponseEntity.ok(projectService.getProjectById(id));
+    @GetMapping("/{uuid}")
+    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(projectService.getProjectByUuid(uuid));
     }
 
     @GetMapping("/search")
@@ -40,31 +41,31 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDTO> createProject(@RequestBody @Valid ProjectRequestDTO dto) {
         ProjectResponseDTO created = projectService.createProject(dto);
 
-        URI location = URI.create("/projects/" + created.id());
+        URI location = URI.create("/projects/" + created.uuid());
 
         return ResponseEntity.created(location).body(created);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProjectResponseDTO> updateProject(@PathVariable Long id,
+    @PutMapping("/{uuid}")
+    public ResponseEntity<ProjectResponseDTO> updateProject(@PathVariable UUID uuid,
                                                             @RequestBody @Valid ProjectRequestDTO dto) {
-        return ResponseEntity.ok(projectService.updateProject(id, dto));
+        return ResponseEntity.ok(projectService.updateProject(uuid, dto));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeProject(@PathVariable Long id) {
-        projectService.removeProject(id);
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> removeProject(@PathVariable UUID uuid) {
+        projectService.removeProject(uuid);
 
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/employees")
-    public ResponseEntity<List<EmployeeResponseDTO>> getProjectEmployees(@PathVariable Long id) {
-        return ResponseEntity.ok(projectService.getProjectEmployees(id));
+    @GetMapping("/{uuid}/employees")
+    public ResponseEntity<List<EmployeeResponseDTO>> getProjectEmployees(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(projectService.getProjectEmployees(uuid));
     }
 
-    @GetMapping("/{id}/tasks")
-    public ResponseEntity<List<TaskResponseDTO>> getProjectTasks(@PathVariable Long id) {
-        return ResponseEntity.ok(projectService.getProjectTasks(id));
+    @GetMapping("/{uuid}/tasks")
+    public ResponseEntity<List<TaskResponseDTO>> getProjectTasks(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(projectService.getProjectTasks(uuid));
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/employees")
@@ -28,9 +29,9 @@ public class EmployeeController {
        return ResponseEntity.ok(employeeService.getAllEmployees(pageable));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable Long id) {
-        return ResponseEntity.ok(employeeService.getEmployeeById(id));
+    @GetMapping("/{uuid}")
+    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(employeeService.getEmployeeByUuid(uuid));
     }
 
     @GetMapping("/me")
@@ -57,27 +58,27 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponseDTO> createEmployee(@RequestBody @Valid EmployeeRequestDTO dto) {
         EmployeeResponseDTO created = employeeService.createEmployee(dto);
 
-        URI location = URI.create("/employees/" + created.id());
+        URI location = URI.create("/employees/" + created.uuid());
 
         return ResponseEntity.created(location).body(created);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id,
+    @PutMapping("/{uuid}")
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable UUID uuid,
                                                               @RequestBody @Valid EmployeeRequestDTO dto) {
-        return ResponseEntity.ok(employeeService.updateEmployee(id, dto));
+        return ResponseEntity.ok(employeeService.updateEmployee(uuid, dto));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeEmployee(@PathVariable Long id) {
-        employeeService.removeEmployee(id);
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> removeEmployee(@PathVariable UUID uuid) {
+        employeeService.removeEmployee(uuid);
 
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/tasks")
-    public ResponseEntity<List<TaskResponseDTO>> getEmployeeTasks(@PathVariable Long id) {
-        return ResponseEntity.ok(employeeService.getEmployeeTasks(id));
+    @GetMapping("/{uuid}/tasks")
+    public ResponseEntity<List<TaskResponseDTO>> getEmployeeTasks(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(employeeService.getEmployeeTasks(uuid));
     }
 
     @GetMapping("/me/tasks")
@@ -85,13 +86,13 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getCurrentEmployeeTasks(authentication.getName()));
     }
 
-    @PutMapping("/{id}/assignProject/{projectId}")
-    public ResponseEntity<EmployeeResponseDTO> assignProject(@PathVariable Long id, @PathVariable Long projectId) {
-        return ResponseEntity.ok(employeeService.assignProject(id, projectId));
+    @PutMapping("/{uuid}/a/{projectUuid}")
+    public ResponseEntity<EmployeeResponseDTO> assignProject(@PathVariable UUID uuid, @PathVariable UUID projectUuid) {
+        return ResponseEntity.ok(employeeService.assignProject(uuid, projectUuid));
     }
 
-    @PutMapping("/{id}/unassignProject/{projectId}")
-    public ResponseEntity<EmployeeResponseDTO> unassignProject(@PathVariable Long id, @PathVariable Long projectId) {
-        return ResponseEntity.ok(employeeService.unassignProject(id, projectId));
+    @PutMapping("/{uuid}/assignProjects/{projectUuid}")
+    public ResponseEntity<EmployeeResponseDTO> unassignProject(@PathVariable UUID uuid, @PathVariable UUID projectUuid) {
+        return ResponseEntity.ok(employeeService.unassignProject(uuid, projectUuid));
     }
 }

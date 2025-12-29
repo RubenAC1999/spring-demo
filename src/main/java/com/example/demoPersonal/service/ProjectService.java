@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProjectService {
@@ -34,16 +35,15 @@ public class ProjectService {
         this.employeeMapper = employeeMapper;
     }
 
-    private Project findProjectOrThrow(Long id) {
-        log.debug("Searching project with id = {}", id);
+    private Project findProjectOrThrow(UUID uuid) {
+        log.debug("Searching project with uuid = {}", uuid);
 
-        return projectRepository.findById(id).orElseThrow(() -> new ProjectNotFoundException(id));
+        return projectRepository.findByUuid(uuid).orElseThrow(() -> new ProjectNotFoundException(uuid));
     }
 
     public ProjectResponseDTO createProject(ProjectRequestDTO dto) {
-        Project project = new Project(
-                dto.name()
-        );
+        Project project = new Project();
+        project.setName(dto.name());
 
         Project saved = projectRepository.save(project);
 
@@ -51,8 +51,8 @@ public class ProjectService {
         return projectMapper.toDTO(saved);
     }
 
-    public ProjectResponseDTO getProjectById(Long id) {
-        Project project = findProjectOrThrow(id);
+    public ProjectResponseDTO getProjectByUuid(UUID uuid) {
+        Project project = findProjectOrThrow(uuid);
 
         return projectMapper.toDTO(project);
     }
@@ -65,8 +65,8 @@ public class ProjectService {
         return projectRepository.findByName(name).stream().map(projectMapper::toDTO).toList();
     }
 
-    public ProjectResponseDTO updateProject(Long id, ProjectRequestDTO dto) {
-        Project project = findProjectOrThrow(id);
+    public ProjectResponseDTO updateProject(UUID uuid, ProjectRequestDTO dto) {
+        Project project = findProjectOrThrow(uuid);
 
         project.setName(dto.name());
 
@@ -77,22 +77,22 @@ public class ProjectService {
         return projectMapper.toDTO(updated);
     }
 
-    public void removeProject(Long id) {
-        Project project = findProjectOrThrow(id);
+    public void removeProject(UUID uuid) {
+        Project project = findProjectOrThrow(uuid);
 
         projectRepository.delete(project);
 
-        log.info("Project {} (id={}) removed successfully.", project.getName(), project.getId());
+        log.info("Project {} (UUID={}) removed successfully.", project.getName(), project.getId());
     }
 
-    public List<TaskResponseDTO> getProjectTasks(Long id) {
-        Project project = findProjectOrThrow(id);
+    public List<TaskResponseDTO> getProjectTasks(UUID uuid) {
+        Project project = findProjectOrThrow(uuid);
 
         return project.getTasks().stream().map(taskMapper::toDTO).toList();
     }
 
-    public List<EmployeeResponseDTO> getProjectEmployees(Long id) {
-        Project project = findProjectOrThrow(id);
+    public List<EmployeeResponseDTO> getProjectEmployees(UUID uuid) {
+        Project project = findProjectOrThrow(uuid);
 
         return project.getEmployees().stream().map(employeeMapper::toDTO).toList();
     }

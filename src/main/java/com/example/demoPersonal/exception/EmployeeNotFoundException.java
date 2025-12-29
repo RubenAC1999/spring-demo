@@ -1,8 +1,10 @@
 package com.example.demoPersonal.exception;
 
+import java.util.UUID;
+
 public class EmployeeNotFoundException extends RuntimeException {
-    public EmployeeNotFoundException(Long id) {
-        super("Error: Employee with ID: " + id + " not found.");
+    public EmployeeNotFoundException(UUID uuid) {
+        super("Error: Employee with UUID: " + uuid + " not found.");
     }
 
     public EmployeeNotFoundException(String email) {

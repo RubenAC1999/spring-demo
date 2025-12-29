@@ -1,14 +1,15 @@
 package com.example.demoPersonal.dto.employee;
 
+import com.example.demoPersonal.dto.project.ProjectResponseDTO;
 import com.example.demoPersonal.entity.enums.Position;
-import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 public record EmployeeResponseDTO (
-    @Setter(AccessLevel.NONE) Long id,
+     UUID uuid,
      String email,
      String name,
      Position position,
-     List<Long> projects_id
+     List<ProjectResponseDTO> projects
 ) {}

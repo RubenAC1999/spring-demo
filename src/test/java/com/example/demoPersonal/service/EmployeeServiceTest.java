@@ -2,6 +2,7 @@ package com.example.demoPersonal.service;
 
 import com.example.demoPersonal.dto.employee.EmployeeRequestDTO;
 import com.example.demoPersonal.dto.employee.EmployeeResponseDTO;
+import com.example.demoPersonal.dto.project.ProjectResponseDTO;
 import com.example.demoPersonal.entity.Employee;
 import com.example.demoPersonal.entity.Project;
 import com.example.demoPersonal.entity.enums.Position;
@@ -9,7 +10,7 @@ import com.example.demoPersonal.exception.EmployeeExistsException;
 import com.example.demoPersonal.exception.EmployeeNotFoundException;
 import com.example.demoPersonal.exception.ProjectNotFoundException;
 import com.example.demoPersonal.mapper.employee.EmployeeMapper;
-import com.example.demoPersonal.mapper.task.TaskMapper;
+import com.example.demoPersonal.mapper.project.ProjectMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
 import com.example.demoPersonal.repository.TaskRepository;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,74 +41,83 @@ import static org.mockito.Mockito.*;
     @Mock
     private EmployeeMapper employeeMapper;
     @Mock
-    private TaskMapper taskMapper;
+    private ProjectMapper projectMapper;
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private EmployeeService employeeService;
 
-    @Test
-    void getEmployeeById_shouldReturnDTO_whenEmployeeExists() {
-        // GIVEN
-        Long employeeId = 1L;
+    private Employee init() {
+        UUID employeeUuid = UUID.randomUUID();
 
         Employee employee = new Employee();
-        employee.setId(employeeId);
+        employee.setUuid(employeeUuid);
         employee.setName("Test");
         employee.setEmail("test@gmail.com");
         employee.setPassword("abc123.");
         employee.setPosition(Position.DEVELOPER);
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        return employee;
+    }
+
+    private EmployeeRequestDTO initToDto() {
+        return new EmployeeRequestDTO(
+                "Test",
+                "test@gmail.com",
+                Position.DEVELOPER,
+                "abc123."
+        );
+    }
+
+    @Test
+    void getEmployeeById_shouldReturnDTO_whenEmployeeExists() {
+        // GIVEN
+       Employee employee = init();
+
+        when(employeeRepository.findByUuid(employee.getUuid())).thenReturn(Optional.of(employee));
 
         EmployeeResponseDTO mappedToDto = new EmployeeResponseDTO(
-                employee.getId(),
+                employee.getUuid(),
                 employee.getEmail(),
                 employee.getName(),
                 employee.getPosition(),
-                employee.getProjects().stream().map(Project::getId).toList()
+                employee.getProjects().stream().map(projectMapper::toDTO).toList()
         );
 
         when(employeeMapper.toDTO(employee)).thenReturn(mappedToDto);
 
         // WHEN
-        EmployeeResponseDTO result = employeeService.getEmployeeById(employeeId);
+        EmployeeResponseDTO result = employeeService.getEmployeeByUuid(employee.getUuid());
 
         // THEN
         assertNotNull(result);
-        assertEquals(employeeId, result.id());
+        assertEquals(employee.getUuid(), result.uuid());
         assertEquals("Test", result.name());
         assertEquals("test@gmail.com", result.email());
 
-        verify(employeeRepository).findById(employeeId);
+        verify(employeeRepository).findByUuid(employee.getUuid());
         verify(employeeMapper).toDTO(employee);
     }
 
     @Test
     void getEmployeeById_shouldThrowException_whenEmployeeNotExists() {
         // GIVEN
-        Long employeeId = 99L;
+        UUID employeeUuid = UUID.randomUUID();
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+        when(employeeRepository.findByUuid(employeeUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(EmployeeNotFoundException.class, () -> employeeService.getEmployeeById(employeeId));
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.getEmployeeByUuid(employeeUuid));
 
-        verify(employeeRepository).findById(employeeId);
+        verify(employeeRepository).findByUuid(employeeUuid);
         verify(employeeMapper, never()).toDTO(any());
     }
-
 
     @Test
     void createEmployee_shouldCreate_whenEmailNotExists() {
         // GIVEN
-        EmployeeRequestDTO dto = new EmployeeRequestDTO(
-                "Test",
-                "test@gmail.com",
-                Position.DEVELOPER,
-                "abc123."
-        );
+        EmployeeRequestDTO dto = initToDto();
 
         String normalizedEmail = dto.email().toLowerCase();
 
@@ -122,11 +133,11 @@ import static org.mockito.Mockito.*;
         when(employeeRepository.save(any(Employee.class))).thenReturn(saved);
 
         EmployeeResponseDTO mappedDTO = new EmployeeResponseDTO(
-                saved.getId(),
+                saved.getUuid(),
                 "test@gmail.com",
                 "Test",
                 Position.DEVELOPER,
-                saved.getProjects().stream().map(Project::getId).toList()
+                saved.getProjects().stream().map(projectMapper::toDTO).toList()
         );
 
         when(employeeMapper.toDTO(saved)).thenReturn(mappedDTO);
@@ -136,7 +147,7 @@ import static org.mockito.Mockito.*;
 
         // THEN
         assertNotNull(result);
-        assertEquals(saved.getId(), result.id());
+        assertEquals(saved.getUuid(), result.uuid());
         assertEquals("Test", result.name());
         assertEquals(normalizedEmail, result.email());
 
@@ -149,12 +160,7 @@ import static org.mockito.Mockito.*;
     @Test
     void createEmployee_shouldThrowException_whenEmailAlreadyExists() {
         // GIVEN
-        EmployeeRequestDTO dto = new EmployeeRequestDTO(
-                "Test",
-                "test@gmail.com",
-                Position.DEVELOPER,
-                "abc123,"
-        );
+        EmployeeRequestDTO dto = initToDto();
 
         when(employeeRepository.existsByEmail("test@gmail.com")).thenReturn(true);
 
@@ -168,32 +174,18 @@ import static org.mockito.Mockito.*;
     @Test
     void updateEmployee_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long employeeId = 1L;
+        Employee employee = init();
 
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        employee.setName("Test");
-        employee.setEmail("test@gmail.com");
-        employee.setPosition(Position.DEVELOPER);
-        employee.setPassword("abc123.");
-
-
-
-        EmployeeRequestDTO dto = new EmployeeRequestDTO(
-                "Updated",
-                "updated@gmail.com",
-                Position.DATA_ENGINEER,
-                "updated123."
-        );
+        EmployeeRequestDTO dto = initToDto();
 
         String normalizedEmail = dto.email().toLowerCase();
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(employeeRepository.findByUuid(employee.getUuid())).thenReturn(Optional.of(employee));
         when(employeeRepository.existsByEmail(normalizedEmail)).thenReturn(false);
 
 
         Employee saved = new Employee();
-        saved.setId(employeeId);
+        saved.setUuid(employee.getUuid());
         saved.setName(dto.name());
         saved.setEmail(normalizedEmail);
         saved.setPosition(dto.position());
@@ -202,17 +194,17 @@ import static org.mockito.Mockito.*;
         when(employeeRepository.save(employee)).thenReturn(saved);
 
         EmployeeResponseDTO mappedToDTO = new EmployeeResponseDTO(
-                saved.getId(),
+                saved.getUuid(),
                 saved.getEmail(),
                 saved.getName(),
                 saved.getPosition(),
-                saved.getProjects().stream().map(Project::getId).toList()
+                saved.getProjects().stream().map(projectMapper::toDTO).toList()
         );
 
         when(employeeMapper.toDTO(saved)).thenReturn(mappedToDTO);
 
         // WHEN
-        EmployeeResponseDTO result = employeeService.updateEmployee(employeeId, dto);
+        EmployeeResponseDTO result = employeeService.updateEmployee(employee.getUuid(), dto);
 
         // THEN
         assertNotNull(result);
@@ -220,7 +212,7 @@ import static org.mockito.Mockito.*;
         assertEquals(normalizedEmail, result.email());
         assertEquals(dto.position(), result.position());
 
-        verify(employeeRepository).findById(employeeId);
+        verify(employeeRepository).findByUuid(employee.getUuid());
         verify(employeeRepository).existsByEmail(normalizedEmail);
         verify(employeeRepository).save(any(Employee.class));
         verify(employeeMapper).toDTO(saved);
@@ -229,30 +221,17 @@ import static org.mockito.Mockito.*;
     @Test
     void updateEmployee_shouldReturnDTO_whenSameEmail() {
         // GIVEN
+       Employee employee = init();
 
-        Long employeeId = 1L;
+       EmployeeRequestDTO dto = initToDto();
 
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        employee.setName("Old");
-        employee.setEmail("oldEmail@gmail.com");
-        employee.setPosition(Position.DEVELOPER);
-        employee.setPassword("test123.");
+       String normalizedEmail = dto.email().toLowerCase();
 
-        EmployeeRequestDTO dto = new EmployeeRequestDTO(
-                "Updated",
-                "oldEmail@gmail.com",
-                Position.DATA_ENGINEER,
-                "test123."
-        );
-
-        String normalizedEmail = dto.email().toLowerCase();
-
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(employeeRepository.findByUuid(employee.getUuid())).thenReturn(Optional.of(employee));
         when(employeeRepository.existsByEmail(normalizedEmail)).thenReturn(true);
 
         Employee updated = new Employee();
-        updated.setId(employeeId);
+        updated.setUuid(employee.getUuid());
         updated.setName(dto.name());
         updated.setEmail(normalizedEmail);
         updated.setPosition(dto.position());
@@ -261,7 +240,7 @@ import static org.mockito.Mockito.*;
         when(employeeRepository.save(employee)).thenReturn(updated);
 
         EmployeeResponseDTO mappedToDTO = new EmployeeResponseDTO(
-                employeeId,
+                updated.getUuid(),
                 normalizedEmail,
                 updated.getName(),
                 updated.getPosition(),
@@ -271,12 +250,12 @@ import static org.mockito.Mockito.*;
         when(employeeMapper.toDTO(updated)).thenReturn(mappedToDTO);
 
         // WHEN
-        EmployeeResponseDTO result = employeeService.updateEmployee(employeeId, dto);
+        EmployeeResponseDTO result = employeeService.updateEmployee(employee.getUuid(), dto);
 
         // THEN
         assertNotNull(result);
-        assertEquals(employeeId, result.id());
-        assertEquals("Updated", result.name());
+        assertEquals(employee.getUuid(), result.uuid());
+        assertEquals("Test", result.name());
         assertEquals(normalizedEmail, result.email());
         assertEquals(dto.position(), result.position());
 
@@ -288,118 +267,98 @@ import static org.mockito.Mockito.*;
     @Test
     void updateEmployee_shouldReturnException_employeeNotExists() {
         // GIVEN
-        Long employeeId = 99L;
+        UUID employeeUuid = UUID.randomUUID();
 
-        EmployeeRequestDTO dto = new EmployeeRequestDTO(
-                "Updated",
-                "updated@gmail.com",
-                Position.DEVELOPER,
-                "updated123."
-        );
+        EmployeeRequestDTO dto = initToDto();
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+        when(employeeRepository.findByUuid(employeeUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(EmployeeNotFoundException.class, () -> employeeService.updateEmployee(employeeId, dto));
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.updateEmployee(employeeUuid, dto));
 
-        verify(employeeRepository).findById(employeeId);
+        verify(employeeRepository).findByUuid(employeeUuid);
     }
 
     @Test
     void updateEmployee_shouldReturnException_sameEmailAsOtherEmployee() {
         // GIVEN
-        Long employeeId = 1L;
-        Long otherEmployeeId = 2L;
-
-        Employee toUpdate = new Employee();
-        toUpdate.setId(employeeId);
-        toUpdate.setName("toUpdate");
-        toUpdate.setEmail("email@gmail.com");
-        toUpdate.setPosition(Position.DEVELOPER);
-        toUpdate.setPassword("abc123.");
-
+        UUID otherEmployeeUuid = UUID.randomUUID();
+        Employee toUpdate = init();
         EmployeeRequestDTO dto = new EmployeeRequestDTO(
-                "Updated",
-                "updatedEmail@gmail.com",
-                toUpdate.getPosition(),
-                "encoded-password"
+                "Test",
+                "other@gmail.com",
+                Position.DEVELOPER,
+                "abc123."
         );
 
         String normalizedEmail = dto.email().toLowerCase();
 
         Employee employeeAlreadyExists = new Employee();
-        employeeAlreadyExists.setId(otherEmployeeId);
+        employeeAlreadyExists.setUuid(otherEmployeeUuid);
         employeeAlreadyExists.setName("Exists");
         employeeAlreadyExists.setEmail(normalizedEmail);
         employeeAlreadyExists.setPosition(Position.DATA_ENGINEER);
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(toUpdate));
+        when(employeeRepository.findByUuid(toUpdate.getUuid())).thenReturn(Optional.of(toUpdate));
         when(employeeRepository.existsByEmail(normalizedEmail)).thenReturn(true);
 
         // WHEN
-        assertThrows(EmployeeExistsException.class, () -> employeeService.updateEmployee(employeeId, dto));
+        assertThrows(EmployeeExistsException.class, () -> employeeService.updateEmployee(toUpdate.getUuid(), dto));
 
         // THEN
-        verify(employeeRepository).findById(employeeId);
+        verify(employeeRepository).findByUuid(toUpdate.getUuid());
         verify(employeeRepository).existsByEmail(normalizedEmail);
     }
 
     @Test
     void assignProject_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long employeeId = 1L;
+        Employee employee = init();
 
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        employee.setName("Test");
-        employee.setEmail("test@gmail.com");
-        employee.setPosition(Position.DEVELOPER);
-        employee.setPassword("abc123.");
-
-        Long projectId = 1L;
+        UUID projectUuid = UUID.randomUUID();
 
         Project project = new Project();
-        project.setId(projectId);
+        project.setUuid(projectUuid);
         project.setName("ProjectTest");
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(employeeRepository.findByUuid(employee.getUuid())).thenReturn(Optional.of(employee));
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.of(project));
 
         Employee updated = new Employee();
-        updated.setId(employeeId);
+        updated.setUuid(employee.getUuid());
         updated.setName(employee.getName());
         updated.setEmail(employee.getEmail());
         updated.setPosition(employee.getPosition());
         updated.addProject(project);
 
-        List<Long> projectIds = updated.getProjects().stream().map(Project::getId).toList();
+        List<ProjectResponseDTO> projects = updated.getProjects().stream().map(projectMapper::toDTO).toList();
 
 
         when(employeeRepository.save(employee)).thenReturn(updated);
 
         EmployeeResponseDTO mappedToDTO = new EmployeeResponseDTO(
-                updated.getId(),
+                updated.getUuid(),
                 updated.getEmail(),
                 updated.getName(),
                 updated.getPosition(),
-                updated.getProjects().stream().map(Project::getId).toList()
+                updated.getProjects().stream().map(projectMapper::toDTO).toList()
         );
 
         when(employeeMapper.toDTO(updated)).thenReturn(mappedToDTO);
 
         // WHEN
-        EmployeeResponseDTO result = employeeService.assignProject(employeeId, projectId);
+        EmployeeResponseDTO result = employeeService.assignProject(employee.getUuid(), projectUuid);
 
         // THEN
         assertNotNull(result);
-        assertEquals(employeeId, result.id());
+        assertEquals(updated.getUuid(), result.uuid());
         assertEquals("Test", result.name());
         assertEquals("test@gmail.com", result.email());
         assertEquals(updated.getPosition(), result.position());
-        assertEquals(projectIds, result.projects_id());
+        assertEquals(projects, result.projects());
 
-        verify(employeeRepository).findById(employeeId);
-        verify(projectRepository).findById(projectId);
+        verify(employeeRepository).findByUuid(employee.getUuid());
+        verify(projectRepository).findByUuid(projectUuid);
         verify(employeeRepository).save(employee);
         verify(employeeMapper).toDTO(updated);
     }
@@ -407,15 +366,15 @@ import static org.mockito.Mockito.*;
     @Test
     void assignProject_shouldThrowException_whenEmployeeNotExists() {
         // GIVEN
-        Long employeeId = 99L;
-        Long projectId = 1L;
+        UUID employeeUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+        when(employeeRepository.findByUuid(employeeUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(EmployeeNotFoundException.class, () -> employeeService.assignProject(employeeId, projectId));
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.assignProject(employeeUuid, projectUuid));
 
-        verify(employeeRepository).findById(employeeId);
+        verify(employeeRepository).findByUuid(employeeUuid);
         verify(projectRepository, never()).findById(any());
         verify(employeeRepository, never()).save(any());
         verify(employeeMapper, never()).toDTO(any());
@@ -424,24 +383,17 @@ import static org.mockito.Mockito.*;
     @Test
     void assignProject_shouldThrowException_whenProjectNotExists() {
         // GIVEN
-        Long employeeId = 1L;
-        Long projectId = 99L;
+        UUID projectUuid = UUID.randomUUID();
+        Employee employee = init();
 
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        employee.setName("Test");
-        employee.setEmail("test@gmail.com");
-        employee.setPosition(Position.DEVELOPER);
-        employee.setPassword("abc123.");
-
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+        when(employeeRepository.findByUuid(employee.getUuid())).thenReturn(Optional.of(employee));
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(ProjectNotFoundException.class, () -> employeeService.assignProject(employeeId, projectId));
+        assertThrows(ProjectNotFoundException.class, () -> employeeService.assignProject(employee.getUuid(), projectUuid));
 
-        verify(employeeRepository).findById(employeeId);
-        verify(projectRepository).findById(projectId);
+        verify(employeeRepository).findByUuid(employee.getUuid());
+        verify(projectRepository).findByUuid(projectUuid);
         verify(employeeRepository, never()).save(any());
         verify(employeeMapper, never()).toDTO(any());
     }
@@ -449,59 +401,52 @@ import static org.mockito.Mockito.*;
     @Test
     void unassignProject_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long employeeId = 1L;
+        Employee employee = init();
 
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        employee.setName("Test");
-        employee.setEmail("test@gmail.com");
-        employee.setPosition(Position.DEVELOPER);
-        employee.setPassword("abc123.");
-
-        Long projectId = 1L;
+        UUID projectUuid = UUID.randomUUID();
 
         Project project = new Project();
-        project.setId(projectId);
+        project.setUuid(projectUuid);
         project.setName("ProjectTest");
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(employeeRepository.findByUuid(employee.getUuid())).thenReturn(Optional.of(employee));
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.of(project));
 
         Employee updated = new Employee();
-        updated.setId(employeeId);
+        updated.setUuid(employee.getUuid());
         updated.setName(employee.getName());
         updated.setEmail(employee.getEmail());
         updated.setPosition(employee.getPosition());
         updated.removeProject(project);
 
-        List<Long> projectIds = updated.getProjects().stream().map(Project::getId).toList();
+        List<ProjectResponseDTO> projects = updated.getProjects().stream().map(projectMapper::toDTO).toList();
 
 
         when(employeeRepository.save(employee)).thenReturn(updated);
 
         EmployeeResponseDTO mappedToDTO = new EmployeeResponseDTO(
-                updated.getId(),
+                updated.getUuid(),
                 updated.getEmail(),
                 updated.getName(),
                 updated.getPosition(),
-                updated.getProjects().stream().map(Project::getId).toList()
+                updated.getProjects().stream().map(projectMapper::toDTO).toList()
         );
 
         when(employeeMapper.toDTO(updated)).thenReturn(mappedToDTO);
 
         // WHEN
-        EmployeeResponseDTO result = employeeService.unassignProject(employeeId, projectId);
+        EmployeeResponseDTO result = employeeService.unassignProject(employee.getUuid(), projectUuid);
 
         // THEN
         assertNotNull(result);
-        assertEquals(employeeId, result.id());
+        assertEquals(employee.getUuid(), result.uuid());
         assertEquals("Test", result.name());
         assertEquals("test@gmail.com", result.email());
         assertEquals(updated.getPosition(), result.position());
-        assertEquals(projectIds, result.projects_id());
+        assertEquals(projects, result.projects());
 
-        verify(employeeRepository).findById(employeeId);
-        verify(projectRepository).findById(projectId);
+        verify(employeeRepository).findByUuid(employee.getUuid());
+        verify(projectRepository).findByUuid(projectUuid);
         verify(employeeRepository).save(employee);
         verify(employeeMapper).toDTO(updated);
     }
@@ -509,15 +454,15 @@ import static org.mockito.Mockito.*;
     @Test
     void unassingProject_shouldThrowException_whenEmployeeNotExists() {
         // GIVEN
-        Long employeeId = 99L;
-        Long projectId = 1L;
+        UUID employeeUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+        when(employeeRepository.findByUuid(employeeUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(EmployeeNotFoundException.class, () -> employeeService.unassignProject(employeeId, projectId));
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.unassignProject(employeeUuid, projectUuid));
 
-        verify(employeeRepository).findById(employeeId);
+        verify(employeeRepository).findByUuid(employeeUuid);
         verify(projectRepository, never()).findById(any());
         verify(employeeRepository, never()).save(any());
         verify(employeeMapper, never()).toDTO(any());
@@ -526,24 +471,18 @@ import static org.mockito.Mockito.*;
     @Test
     void unassignProject_shouldThrowException_whenProjectNotExists() {
         // GIVEN
-        Long employeeId = 1L;
-        Long projectId = 99L;
+        UUID projectUuid = UUID.randomUUID();
 
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        employee.setName("Test");
-        employee.setEmail("test@gmail.com");
-        employee.setPosition(Position.DEVELOPER);
-        employee.setPassword("abc123.");
+        Employee employee = init();
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+        when(employeeRepository.findByUuid(employee.getUuid())).thenReturn(Optional.of(employee));
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(ProjectNotFoundException.class, () -> employeeService.unassignProject(employeeId, projectId));
+        assertThrows(ProjectNotFoundException.class, () -> employeeService.unassignProject(employee.getUuid(), projectUuid));
 
-        verify(employeeRepository).findById(employeeId);
-        verify(projectRepository).findById(projectId);
+        verify(employeeRepository).findByUuid(employee.getUuid());
+        verify(projectRepository).findByUuid(projectUuid);
         verify(employeeRepository, never()).save(any());
         verify(employeeMapper, never()).toDTO(any());
     }

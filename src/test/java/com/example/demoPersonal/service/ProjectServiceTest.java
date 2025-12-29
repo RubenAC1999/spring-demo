@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,18 +38,18 @@ class ProjectServiceTest {
     @Test
     void createProject_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long projectId = 1L;
+        UUID projectUuid = UUID.randomUUID();
 
         ProjectRequestDTO dto = new ProjectRequestDTO(
                 "Test"
         );
 
         Project saved = new Project();
-        saved.setId(projectId);
+        saved.setUuid(projectUuid);
         saved.setName("Test");
 
         ProjectResponseDTO mappedToDTO = new ProjectResponseDTO(
-                projectId,
+                saved.getUuid(),
                 saved.getName()
         );
 
@@ -60,7 +61,7 @@ class ProjectServiceTest {
 
         // THEN
         assertNotNull(result);
-        assertEquals(projectId, result.id());
+        assertEquals(saved.getUuid(), result.uuid());
         assertEquals(saved.getName(), result.name());
 
         verify(projectRepository).save(any(Project.class));
@@ -70,36 +71,36 @@ class ProjectServiceTest {
     @Test
     void updateProject_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long projectId = 1L;
+        UUID projectUuid = UUID.randomUUID();
 
         ProjectRequestDTO dto = new ProjectRequestDTO(
                 "Updated"
         );
 
         Project toUpdate = new Project();
-        toUpdate.setId(projectId);
+        toUpdate.setUuid(projectUuid);
         toUpdate.setName(dto.name());
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(toUpdate));
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.of(toUpdate));
 
         when(projectRepository.save(any(Project.class))).thenReturn(toUpdate);
 
         ProjectResponseDTO mappedToDTO = new ProjectResponseDTO(
-                projectId,
+                toUpdate.getUuid(),
                 toUpdate.getName()
         );
 
         when(projectMapper.toDTO(toUpdate)).thenReturn(mappedToDTO);
 
         // WHEN
-        ProjectResponseDTO result = projectService.updateProject(projectId, dto);
+        ProjectResponseDTO result = projectService.updateProject(projectUuid, dto);
 
         // THEN
         assertNotNull(result);
-        assertEquals(projectId, result.id());
+        assertEquals(toUpdate.getUuid(), result.uuid());
         assertEquals(dto.name(), result.name());
 
-        verify(projectRepository).findById(projectId);
+        verify(projectRepository).findByUuid(projectUuid);
         verify(projectRepository).save(any(Project.class));
         verify(projectMapper).toDTO(toUpdate);
     }
@@ -107,19 +108,17 @@ class ProjectServiceTest {
     @Test
     void updateProject_shouldThrowException_whenProjectNotExists() {
         // GIVEN
-        Long projectId = 99L;
+        UUID projectUuid = UUID.randomUUID();
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.empty());
 
         ProjectRequestDTO dto = new ProjectRequestDTO("Test");
 
         // WHEN - THEN
-        assertThrows(ProjectNotFoundException.class, () -> projectService.updateProject(projectId, dto));
+        assertThrows(ProjectNotFoundException.class, () -> projectService.updateProject(projectUuid, dto));
 
-        verify(projectRepository).findById(projectId);
+        verify(projectRepository).findByUuid(projectUuid);
         verify(projectRepository, never()).save(any(Project.class));
         verify(projectMapper, never()).toDTO(any(Project.class));
     }
-
-
 }

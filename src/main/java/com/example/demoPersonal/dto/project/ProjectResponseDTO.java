@@ -1,10 +1,7 @@
 package com.example.demoPersonal.dto.project;
-
-import lombok.*;
+import java.util.UUID;
 
 public record ProjectResponseDTO (
-    @Setter(AccessLevel.NONE)
-    Long id,
-
+    UUID uuid,
     String name
 ) {}

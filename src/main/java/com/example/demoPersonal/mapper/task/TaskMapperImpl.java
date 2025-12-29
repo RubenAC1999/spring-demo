@@ -13,21 +13,22 @@ public class TaskMapperImpl implements TaskMapper {
     @Override
     public TaskResponseDTO toDTO(Task task) {
         return new TaskResponseDTO(
-                task.getId(),
+                task.getUuid(),
                 task.getDescription(),
                 task.getStatus(),
                 task.getCreatedAt(),
                 task.getUpdatedAt(),
-                task.getEmployee() == null ? null : task.getEmployee().getId(),
-                task.getProject().getId()
+                task.getEmployee() == null ? null : task.getEmployee().getUuid(),
+                task.getProject().getUuid()
                 );
     }
 
     @Override
     public Task toEntity(TaskRequestDTO dto, Project project) {
-        return new Task(
-                dto.description(),
-                project
-        );
+        Task task = new Task();
+        task.setDescription(dto.description());
+        task.setProject(project);
+
+        return task;
     }
 }

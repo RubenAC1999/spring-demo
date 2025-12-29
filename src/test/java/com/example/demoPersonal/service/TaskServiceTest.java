@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,36 +45,36 @@ class TaskServiceTest {
     @Test
     void createTask_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long taskId = 1L;
-        Long projectId = 1L;
+        UUID taskUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
 
         Project project = new Project();
-        project.setId(projectId);
+        project.setUuid(taskUuid);
         project.setName("Test");
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.of(project));
 
         TaskRequestDTO dto = new TaskRequestDTO(
                 "Test",
                 Status.TODO,
-                1L
+                projectUuid
         );
 
         Task saved = new Task();
-        saved.setId(taskId);
+        saved.setUuid(taskUuid);
         saved.setDescription(dto.description());
         saved.setProject(project);
 
         when(taskRepository.save(any(Task.class))).thenReturn(saved);
 
         TaskResponseDTO mappedToDTO = new TaskResponseDTO(
-                taskId,
+                taskUuid,
                 dto.description(),
                 dto.status(),
                 saved.getCreatedAt(),
                 saved.getUpdatedAt(),
                 null,
-                dto.projectId()
+                dto.projectUuid()
         );
 
         when(taskMapper.toDTO(saved)).thenReturn(mappedToDTO);
@@ -83,14 +84,14 @@ class TaskServiceTest {
 
         // THEN
         assertNotNull(result);
-        assertEquals(taskId, result.id());
+        assertEquals(taskUuid, result.uuid());
         assertEquals(dto.description(), result.description());
         assertEquals(dto.status(), result.status());
         assertEquals(saved.getCreatedAt(), result.createdAt());
         assertEquals(saved.getUpdatedAt(), result.updatedAt());
-        assertEquals(dto.projectId(), result.projectId());
+        assertEquals(dto.projectUuid(), result.projectUuid());
 
-        verify(projectRepository).findById(projectId);
+        verify(projectRepository).findByUuid(projectUuid);
         verify(taskRepository).save(any(Task.class));
         verify(taskMapper).toDTO(saved);
     }
@@ -98,19 +99,19 @@ class TaskServiceTest {
     @Test
     void createTask_shouldReturnException_whenProjectNotExists() {
         // GIVEN
-        Long projectId = 99L;
-        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+        UUID projectUuid = UUID.randomUUID();
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.empty());
 
         TaskRequestDTO dto = new TaskRequestDTO(
                 "Test",
                 Status.TODO,
-                projectId
+                projectUuid
         );
 
         // WHEN - THEN
         assertThrows(ProjectNotFoundException.class, () -> taskService.createTask(dto));
 
-        verify(projectRepository).findById(projectId);
+        verify(projectRepository).findByUuid(projectUuid);
         verify(taskRepository, never()).save(any(Task.class));
         verify(taskMapper, never()).toDTO(any(Task.class));
     }
@@ -118,58 +119,58 @@ class TaskServiceTest {
     @Test
     void updateTask_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long taskId = 1L;
-        Long projectId = 1L;
+        UUID taskUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
 
         Project project = new Project();
-        project.setId(projectId);
+        project.setUuid(projectUuid);
         project.setName("Project test");
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.of(project));
 
 
         TaskRequestDTO dto = new TaskRequestDTO(
                 "Updated",
                 Status.DONE,
-                projectId
+                projectUuid
         );
 
         Task toUpdate = new Task();
-        toUpdate.setId(taskId);
+        toUpdate.setUuid(projectUuid);
         toUpdate.setDescription(dto.description());
         toUpdate.setStatus(dto.status());
         toUpdate.setProject(project);
 
-        when(taskRepository.findById(taskId)).thenReturn(Optional.of(toUpdate));
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.of(toUpdate));
         when(taskRepository.save(any(Task.class))).thenReturn(toUpdate);
 
         TaskResponseDTO mappedToDTO = new TaskResponseDTO(
-                taskId,
+                taskUuid,
                 dto.description(),
                 dto.status(),
                 toUpdate.getCreatedAt(),
                 toUpdate.getUpdatedAt(),
                 null,
-                dto.projectId()
+                dto.projectUuid()
         );
 
 
         when(taskMapper.toDTO(toUpdate)).thenReturn(mappedToDTO);
 
         // WHEN
-        TaskResponseDTO result = taskService.updateTask(taskId, dto);
+        TaskResponseDTO result = taskService.updateTask(taskUuid, dto);
 
         // THEN
         assertNotNull(result);
-        assertEquals(taskId, result.id());
+        assertEquals(taskUuid, result.uuid());
         assertEquals(dto.description(), result.description());
         assertEquals(dto.status(), result.status());
         assertEquals(toUpdate.getCreatedAt(), result.createdAt());
         assertEquals(toUpdate.getUpdatedAt(), result.updatedAt());
-        assertEquals(dto.projectId(), result.projectId());
+        assertEquals(dto.projectUuid(), result.projectUuid());
 
-        verify(projectRepository).findById(projectId);
-        verify(taskRepository).findById(taskId);
+        verify(projectRepository).findByUuid(projectUuid);
+        verify(taskRepository).findByUuid(taskUuid);
         verify(taskRepository).save(any(Task.class));
         verify(taskMapper).toDTO(any(Task.class));
     }
@@ -177,21 +178,22 @@ class TaskServiceTest {
     @Test
     void updateTask_shouldThrowException_whenTaskNotExists() {
         // GIVEN
-        Long taskId = 99L;
-        Long projectId = 1L;
+        UUID taskUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
+
         TaskRequestDTO dto = new TaskRequestDTO(
                 "Test",
                 Status.TODO,
-                projectId
+                projectUuid
         );
 
-        when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(TaskNotFoundException.class, () -> taskService.updateTask(taskId, dto));
+        assertThrows(TaskNotFoundException.class, () -> taskService.updateTask(taskUuid, dto));
 
-        verify(taskRepository).findById(taskId);
-        verify(projectRepository, never()).findById(projectId);
+        verify(taskRepository).findByUuid(taskUuid);
+        verify(projectRepository, never()).findByUuid(projectUuid);
         verify(taskRepository, never()).save(any(Task.class));
         verify(taskMapper, never()).toDTO(any(Task.class));
     }
@@ -199,8 +201,8 @@ class TaskServiceTest {
     @Test
     void updateTask_shouldThowException_whenProjectNotExists() {
         // GIVEN
-        Long taskId = 1L;
-        Long projectId = 99L;
+        UUID taskUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
 
         Project project = new Project();
         project.setId(1L);
@@ -209,25 +211,25 @@ class TaskServiceTest {
         TaskRequestDTO dto = new TaskRequestDTO(
                 "Test",
                 Status.TODO,
-                99L
+                projectUuid
         );
 
         Task task = new Task();
-        task.setId(taskId);
+        task.setUuid(taskUuid);
         task.setDescription(dto.description());
         task.setStatus(dto.status());
         task.setProject(project);
 
 
 
-        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
-        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.of(task));
+        when(projectRepository.findByUuid(projectUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(ProjectNotFoundException.class, () -> taskService.updateTask(taskId, dto));
+        assertThrows(ProjectNotFoundException.class, () -> taskService.updateTask(taskUuid, dto));
 
-        verify(taskRepository).findById(taskId);
-        verify(projectRepository).findById(projectId);
+        verify(taskRepository).findByUuid(taskUuid);
+        verify(projectRepository).findByUuid(projectUuid);
         verify(taskRepository, never()).save(any(Task.class));
         verify(taskMapper, never()).toDTO(any(Task.class));
     }
@@ -235,26 +237,26 @@ class TaskServiceTest {
     @Test
     void removeTask_shouldNotReturn_whenDataIsValid() {
         // GIVEN
-        Long taskId = 1L;
-        Long projectId = 99L;
+        UUID taskUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
 
         Project project = new Project();
-        project.setId(projectId);
+        project.setUuid(projectUuid);
         project.setName("TestProject");
 
         Task task = new Task();
-        task.setId(taskId);
+        task.setUuid(taskUuid);
         task.setDescription("Test");
         task.setStatus(Status.TODO);
         task.setProject(project);
 
-        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.of(task));
 
         // WHEN
-        taskService.removeTask(taskId);
+        taskService.removeTask(taskUuid);
 
         // THEN
-        verify(taskRepository).findById(taskId);
+        verify(taskRepository).findByUuid(taskUuid);
         verify(taskRepository).delete(task);
     }
 
@@ -262,71 +264,71 @@ class TaskServiceTest {
     @Test
     void removeTask_shouldThrowException_whenTaskNotExists() {
         // GIVEN
-        Long taskId = 1L;
+        UUID taskUuid = UUID.randomUUID();
 
-        when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.empty());
 
         // WHEN
-        assertThrows(TaskNotFoundException.class, () -> taskService.removeTask(taskId));
+        assertThrows(TaskNotFoundException.class, () -> taskService.removeTask(taskUuid));
 
         // THEN
-        verify(taskRepository).findById(taskId);
+        verify(taskRepository).findByUuid(taskUuid);
         verify(taskRepository, never()).delete(any(Task.class));
     }
 
     @Test
     void assignTask_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long taskId = 1L;
-        Long employeeId = 1L;
+        UUID taskUuid = UUID.randomUUID();
+        UUID employeeUuid = UUID.randomUUID();
 
         Employee employee = new Employee();
-        employee.setId(employeeId);
+        employee.setUuid(employeeUuid);
         employee.setName("Test");
         employee.setEmail("test@gmail.com");
         employee.setPosition(Position.DEVELOPER);
         employee.setPassword("abc123.");
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(employeeRepository.findByUuid(employeeUuid)).thenReturn(Optional.of(employee));
 
         Project project = new Project();
         project.setId(1L);
         project.setName("Test");
 
         Task task = new Task();
-        task.setId(taskId);
+        task.setUuid(taskUuid);
         task.setDescription("Test");
         task.setStatus(Status.TODO);
         task.setProject(project);
         task.setEmployee(employee);
 
-        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.of(task));
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         TaskResponseDTO mappedToDTO = new TaskResponseDTO(
-                taskId,
+                taskUuid,
                 task.getDescription(),
                 task.getStatus(),
                 task.getCreatedAt(),
                 task.getUpdatedAt(),
-                task.getEmployee().getId(),
-                project.getId()
+                task.getEmployee().getUuid(),
+                project.getUuid()
         );
 
         when(taskMapper.toDTO(task)).thenReturn(mappedToDTO);
 
         // WHEN
-        TaskResponseDTO result = taskService.assignTask(taskId, employeeId);
+        TaskResponseDTO result = taskService.assignTask(taskUuid, employeeUuid);
 
         // THEN
         assertNotNull(result);
-        assertEquals(taskId, result.id());
+        assertEquals(taskUuid, result.uuid());
         assertEquals(task.getDescription(), result.description());
         assertEquals(task.getStatus(), result.status());
-        assertEquals(employeeId, result.employeeId());
+        assertEquals(employeeUuid, result.employeeUuid());
 
-        verify(employeeRepository).findById(employeeId);
-        verify(taskRepository).findById(taskId);
+        verify(employeeRepository).findByUuid(employeeUuid);
+        verify(taskRepository).findByUuid(taskUuid);
         verify(taskRepository).save(any(Task.class));
         verify(taskMapper).toDTO(task);
     }
@@ -334,16 +336,16 @@ class TaskServiceTest {
     @Test
     void assignTask_shouldReturnException_whenEmployeeNotExists() {
         // GIVEN
-        Long employeeId = 99L;
-        Long taskId = 1L;
+        UUID taskUuid = UUID.randomUUID();
+        UUID employeeUuid = UUID.randomUUID();
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+        when(employeeRepository.findByUuid(employeeUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(EmployeeNotFoundException.class, () -> taskService.assignTask(taskId, employeeId));
+        assertThrows(EmployeeNotFoundException.class, () -> taskService.assignTask(taskUuid, employeeUuid));
 
-        verify(employeeRepository).findById(employeeId);
-        verify(taskRepository, never()).findById(taskId);
+        verify(employeeRepository).findByUuid(employeeUuid);
+        verify(taskRepository, never()).findByUuid(taskUuid);
         verify(taskRepository, never()).save(any(Task.class));
         verify(taskMapper, never()).toDTO(any(Task.class));
     }
@@ -351,20 +353,20 @@ class TaskServiceTest {
     @Test
     void assignTask_shouldReturnException_whenTaskNotExists() {
         // GIVEN
-        Long employeeId = 99L;
-        Long taskId = 1L;
+        UUID employeeUuid = UUID.randomUUID();
+        UUID taskUuid = UUID.randomUUID();
 
         Employee employee = new Employee();
-        employee.setId(employeeId);
+        employee.setUuid(employeeUuid);
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+        when(employeeRepository.findByUuid(employeeUuid)).thenReturn(Optional.of(employee));
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(TaskNotFoundException.class, () -> taskService.assignTask(taskId, employeeId));
+        assertThrows(TaskNotFoundException.class, () -> taskService.assignTask(taskUuid, employeeUuid));
 
-        verify(employeeRepository).findById(employeeId);
-        verify(taskRepository).findById(taskId);
+        verify(employeeRepository).findByUuid(employeeUuid);
+        verify(taskRepository).findByUuid(taskUuid);
         verify(taskRepository, never()).save(any(Task.class));
         verify(taskMapper, never()).toDTO(any(Task.class));
     }
@@ -372,23 +374,23 @@ class TaskServiceTest {
     @Test
     void unassignTask_shouldReturnDTO_whenDataIsValid() {
         // GIVEN
-        Long taskId = 1L;
-        Long projectId = 1L;
+        UUID taskUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
 
         Task task = new Task();
-        task.setId(taskId);
+        task.setUuid(taskUuid);
         task.setDescription("Test");
 
-        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.of(task));
 
         TaskResponseDTO mappedToDTO = new TaskResponseDTO(
-                taskId,
+                taskUuid,
                 task.getDescription(),
                 Status.TODO,
                 task.getCreatedAt(),
                 task.getUpdatedAt(),
                 null,
-                projectId
+                projectUuid
         );
 
         when(taskRepository.save(any(Task.class))).thenReturn(task);
@@ -396,14 +398,14 @@ class TaskServiceTest {
         when(taskMapper.toDTO(task)).thenReturn(mappedToDTO);
 
         // WHEN
-        TaskResponseDTO result = taskService.unassingTask(taskId);
+        TaskResponseDTO result = taskService.unassingTask(taskUuid);
 
         // THEN
         assertNotNull(result);
-        assertEquals(taskId, result.id());
-        assertNull(result.employeeId());
+        assertEquals(taskUuid, result.uuid());
+        assertNull(result.employeeUuid());
 
-        verify(taskRepository).findById(taskId);
+        verify(taskRepository).findByUuid(taskUuid);
         verify(taskRepository).save(any(Task.class));
         verify(taskMapper).toDTO(task);
     }
@@ -411,15 +413,15 @@ class TaskServiceTest {
     @Test
     void unassignTask_shouldReturnException_whenTaskNotExists() {
         // GIVEN
-        Long taskId = 1L;
+        UUID taskUuid = UUID.randomUUID();
 
-        when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+        when(taskRepository.findByUuid(taskUuid)).thenReturn(Optional.empty());
 
         // WHEN - THEN
-        assertThrows(TaskNotFoundException.class, () -> taskService.unassingTask(taskId));
+        assertThrows(TaskNotFoundException.class, () -> taskService.unassingTask(taskUuid));
 
         // THEN
-        verify(taskRepository).findById(taskId);
+        verify(taskRepository).findByUuid(taskUuid);
         verify(taskRepository, never()).save(any(Task.class));
         verify(taskMapper, never()).toDTO(any(Task.class));
     }

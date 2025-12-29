@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/tasks")
@@ -26,9 +27,9 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getAllTasks(pageable));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> getTaskById(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.getTaskById(id));
+    @GetMapping("/{uuid}")
+    public ResponseEntity<TaskResponseDTO> getTaskByUuid(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(taskService.getTaskByUuid(uuid));
     }
 
     @GetMapping("/search-by-description")
@@ -50,30 +51,30 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> createTask(@RequestBody @Valid TaskRequestDTO dto) {
         TaskResponseDTO task = taskService.createTask(dto);
 
-        URI location = URI.create("/tasks/" + task.id());
+        URI location = URI.create("/tasks/" + task.uuid());
 
         return ResponseEntity.created(location).body(task);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable Long id, @RequestBody @Valid TaskRequestDTO dto) {
-        return ResponseEntity.ok(taskService.updateTask(id, dto));
+    @PutMapping("/{uuid}")
+    public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable UUID uuid, @RequestBody @Valid TaskRequestDTO dto) {
+        return ResponseEntity.ok(taskService.updateTask(uuid, dto));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeTask(@PathVariable Long id) {
-        taskService.removeTask(id);
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> removeTask(@PathVariable UUID uuid) {
+        taskService.removeTask(uuid);
 
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/assign/{employeeId}")
-    public ResponseEntity<TaskResponseDTO> assignTask(@PathVariable Long id, @PathVariable Long employeeId) {
-        return ResponseEntity.ok(taskService.assignTask(id, employeeId));
+    @PutMapping("/{uuid}/employees/{employeeUuid}")
+    public ResponseEntity<TaskResponseDTO> assignTask(@PathVariable UUID uuid, @PathVariable UUID employeeUuid) {
+        return ResponseEntity.ok(taskService.assignTask(uuid, employeeUuid));
     }
 
-    @PutMapping("/{id}/unassign")
-    public ResponseEntity<TaskResponseDTO> unassignTask(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.unassingTask(id));
+    @PutMapping("/{uuid}/employees")
+    public ResponseEntity<TaskResponseDTO> unassignTask(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(taskService.unassingTask(uuid));
     }
 }

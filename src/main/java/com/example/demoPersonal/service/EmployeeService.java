@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -50,9 +51,9 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    private Employee findByIdOrThrow(Long id) {
-        log.debug("Searching employee with id = {}", id);
-        return employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
+    private Employee findByUuidOrThrow(UUID uuid) {
+        log.debug("Searching employee with uuid = {}", uuid);
+        return employeeRepository.findByUuid(uuid).orElseThrow(() -> new EmployeeNotFoundException(uuid));
     }
 
     public EmployeeResponseDTO createEmployee(EmployeeRequestDTO dto) {
@@ -80,8 +81,8 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public EmployeeResponseDTO getEmployeeById(Long id) {
-       Employee employee = findByIdOrThrow(id);
+    public EmployeeResponseDTO getEmployeeByUuid(UUID uuid) {
+       Employee employee = findByUuidOrThrow(uuid);
 
        return employeeMapper.toDTO(employee);
     }
@@ -90,7 +91,7 @@ public class EmployeeService {
     public EmployeeResponseDTO getCurrentEmployee(String email) {
         String normalizedEmail = email.toLowerCase();
 
-        Employee currentEmployee = employeeRepository.findByEmail(email)
+        Employee currentEmployee = employeeRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new EmployeeNotFoundException(email));
 
         return employeeMapper.toDTO(currentEmployee);
@@ -101,8 +102,8 @@ public class EmployeeService {
         return employeeRepository.findAll(pageable).stream().map(employeeMapper::toDTO).toList();
     }
 
-    public EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO dto) {
-        Employee employee = findByIdOrThrow(id);
+    public EmployeeResponseDTO updateEmployee(UUID uuid, EmployeeRequestDTO dto) {
+        Employee employee = findByUuidOrThrow(uuid);
 
         String email = dto.email().toLowerCase();
 
@@ -124,11 +125,11 @@ public class EmployeeService {
         return employeeMapper.toDTO(updated);
     }
 
-    public void removeEmployee(Long id) {
-        Employee employee = findByIdOrThrow(id);
+    public void removeEmployee(UUID uuid) {
+        Employee employee = findByUuidOrThrow(uuid);
 
         employeeRepository.delete(employee);
-        log.info("Employee with id={} removed", id);
+        log.info("Employee with id={} removed", uuid);
     }
 
     @Transactional(readOnly = true)
@@ -152,8 +153,8 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public List<TaskResponseDTO> getEmployeeTasks(Long id) {
-        Employee employee = findByIdOrThrow(id);
+    public List<TaskResponseDTO> getEmployeeTasks(UUID uuid) {
+        Employee employee = findByUuidOrThrow(uuid);
 
         return employee.getTasks().stream().map(taskMapper::toDTO).toList();
     }
@@ -169,34 +170,34 @@ public class EmployeeService {
     }
 
 
-    public EmployeeResponseDTO assignProject(Long employeeId, Long projectId) {
-        log.info("Assigning project {} to employee {}", projectId, employeeId);
+    public EmployeeResponseDTO assignProject(UUID employeeUuid, UUID projectUuid) {
+        log.info("Assigning project {} to employee {}", projectUuid, employeeUuid);
 
-        Employee employee = findByIdOrThrow(employeeId);
-        Project project = projectRepository.findById(projectId).orElseThrow(()
-                -> new ProjectNotFoundException(projectId));
+        Employee employee = findByUuidOrThrow(employeeUuid);
+        Project project = projectRepository.findByUuid(projectUuid).orElseThrow(()
+                -> new ProjectNotFoundException(projectUuid));
 
         employee.addProject(project);
 
         Employee updated = employeeRepository.save(employee);
 
-        log.info("Project {} assigned to employee {}", project.getName(), updated.getId());
+        log.info("Project {} assigned to employee {}", project.getName(), updated.getUuid());
 
         return employeeMapper.toDTO(updated);
     }
 
-    public EmployeeResponseDTO unassignProject(Long employeeId, Long projectId) {
-        log.info("Unassigning project {} to employee {}", projectId, employeeId);
+    public EmployeeResponseDTO unassignProject(UUID employeeUuid, UUID projectUuid) {
+        log.info("Unassigning project {} to employee {}", employeeUuid, projectUuid);
 
-        Employee employee = findByIdOrThrow(employeeId);
-        Project project = projectRepository.findById(projectId).orElseThrow(() ->
-                new ProjectNotFoundException(projectId));
+        Employee employee = findByUuidOrThrow(employeeUuid);
+        Project project = projectRepository.findByUuid(projectUuid).orElseThrow(() ->
+                new ProjectNotFoundException(projectUuid));
 
         employee.removeProject(project);
 
         Employee updated = employeeRepository.save(employee);
 
-        log.info("Project {} unassigned to employee {}", project.getName(), employeeId);
+        log.info("Project {} unassigned to employee {}", project.getName(), employee.getName());
         return employeeMapper.toDTO(updated);
     }
 }

@@ -66,12 +66,4 @@ public class Task {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-
-    public Task(String description, Project project) {
-        this.description = description;
-        this.project = project;
-    }
-
-
-
 }

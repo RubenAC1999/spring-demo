@@ -10,15 +10,16 @@ public class ProjectMapperImpl implements ProjectMapper {
     @Override
     public ProjectResponseDTO toDTO(Project project) {
         return new ProjectResponseDTO(
-                project.getId(),
+                project.getUuid(),
                 project.getName()
         );
     }
 
     @Override
     public Project toEntity(ProjectRequestDTO dto) {
-        return new Project(
-                dto.name()
-        );
+        Project project = new Project();
+        project.setName(dto.name());
+
+        return project;
     }
 }
