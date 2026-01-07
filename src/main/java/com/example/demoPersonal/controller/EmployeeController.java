@@ -86,12 +86,12 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getCurrentEmployeeTasks(authentication.getName()));
     }
 
-    @PutMapping("/{uuid}/a/{projectUuid}")
+    @PutMapping("/{uuid}/projects/{projectUuid}")
     public ResponseEntity<EmployeeResponseDTO> assignProject(@PathVariable UUID uuid, @PathVariable UUID projectUuid) {
         return ResponseEntity.ok(employeeService.assignProject(uuid, projectUuid));
     }
 
-    @PutMapping("/{uuid}/assignProjects/{projectUuid}")
+    @DeleteMapping("/{uuid}/projects/{projectUuid}")
     public ResponseEntity<EmployeeResponseDTO> unassignProject(@PathVariable UUID uuid, @PathVariable UUID projectUuid) {
         return ResponseEntity.ok(employeeService.unassignProject(uuid, projectUuid));
     }

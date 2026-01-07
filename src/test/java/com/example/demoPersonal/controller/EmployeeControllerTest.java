@@ -2,6 +2,7 @@ package com.example.demoPersonal.controller;
 
 import com.example.demoPersonal.dto.employee.EmployeeRequestDTO;
 import com.example.demoPersonal.dto.employee.EmployeeResponseDTO;
+import com.example.demoPersonal.dto.project.ProjectResponseDTO;
 import com.example.demoPersonal.entity.enums.Position;
 import com.example.demoPersonal.security.CustomUserDetailsService;
 import com.example.demoPersonal.security.JwtService;
@@ -19,8 +20,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,8 +32,6 @@ public class EmployeeControllerTest {
     @MockitoBean EmployeeService employeeService;
     @MockitoBean JwtService jwtService;
     @MockitoBean CustomUserDetailsService userDetailsService;
-
-
 
     @Test
     void createEmployee_shouldReturn201() throws Exception {
@@ -69,5 +67,28 @@ public class EmployeeControllerTest {
        mockMvc.perform(delete("/employees/{uuid}", uuid)).andExpect(status().isNoContent());
 
        verify(employeeService).removeEmployee(uuid);
+    }
+
+    @Test
+    void assignProject_shouldReturn200() throws Exception {
+        UUID employeeUuid = UUID.randomUUID();
+        UUID projectUuid = UUID.randomUUID();
+
+        EmployeeResponseDTO response = new EmployeeResponseDTO(
+                employeeUuid,
+                "test@gmail.com",
+                "Test",
+                Position.DEVELOPER,
+                List.of(
+                        new ProjectResponseDTO(projectUuid, "Project")
+                )
+        );
+
+        when(employeeService.assignProject(employeeUuid, projectUuid)).thenReturn(response);
+
+        mockMvc.perform(put("/employees/{employeeUuid}/projects/{projectUuid}", employeeUuid, projectUuid))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.uuid").value(employeeUuid.toString()))
+                .andExpect(jsonPath("$.projects[0].uuid").value(projectUuid.toString()));
     }
 }
