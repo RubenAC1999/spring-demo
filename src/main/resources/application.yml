@@ -1,13 +1,9 @@
 spring:
-  flyway:
-    enabled: true
-  datasource:
-    url: jdbc:postgresql://localhost:5432/demodb?currentSchema=company
-    username: db_user
-    password: user123
+  application:
+    name: demo-personal
 
     jpa:
-      hibernate:
-        ddl-auto: validate
-        properties:
-          hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      open-in-view: false
+
+      server:
+        port: 8080

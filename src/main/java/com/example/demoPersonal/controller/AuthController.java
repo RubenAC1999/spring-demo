@@ -6,6 +6,9 @@ import com.example.demoPersonal.security.JwtService;
 import com.example.demoPersonal.dto.login.AuthResponseDTO;
 import com.example.demoPersonal.dto.login.LoginRequestDTO;
 import com.example.demoPersonal.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +33,28 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @Operation(
+            summary = "Registrar usuario",
+            description = "Crear un nuevo usuario en el sistema"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Usuario creado correctamente"),
+            @ApiResponse(responseCode = "403", description = "Datos inválidos")
+    })
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@RequestBody @Valid RegisterRequestDTO dto) {
         return ResponseEntity.status(201).body(authService.register(dto));
     }
 
 
+    @Operation(
+            summary = "Iniciar sesión",
+            description = "Iniciar sesión en el sistema"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Iniciada sesión correctamente"),
+            @ApiResponse(responseCode = "403", description = "Datos inválidos")
+    })
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO dto) {
         return ResponseEntity.ok(authService.login(dto));
