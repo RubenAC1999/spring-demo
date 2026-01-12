@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/employees")
+@RequestMapping("/api/v1/employees")
 @Tag(name = "Employees", description = "Operaciones sobre empleados")
 // Recomendado porque todos los métodos necesitan JWT
 @SecurityRequirement(name = "bearerAuth")
