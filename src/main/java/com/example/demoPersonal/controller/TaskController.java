@@ -4,6 +4,9 @@ import com.example.demoPersonal.dto.task.TaskRequestDTO;
 import com.example.demoPersonal.dto.task.TaskResponseDTO;
 import com.example.demoPersonal.entity.enums.Status;
 import com.example.demoPersonal.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +45,12 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getTaskByStatus(status));
     }
 
+
+    @Operation(
+            summary = "Listar tareas sin asignar",
+            description = "Muestra las tareas en las que no hay ningún empleado asinado"
+    )
+    @ApiResponse(responseCode = "200", description = "Lista si hay tareas sin asignar, si no, devuelve una lista vacía")
     @GetMapping("search-unassigned")
     public ResponseEntity<List<TaskResponseDTO>> getUnassignedTasks() {
         return ResponseEntity.ok(taskService.getUnassingedTasks());
@@ -68,11 +77,27 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Asignar tarea",
+            description = "Asigna la tarea a un emploeado"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Se asigna la tarea a un empleado correctamente"),
+            @ApiResponse(responseCode = "403", description = "Error de autorización, JWT no válido")
+    })
     @PutMapping("/{uuid}/employees/{employeeUuid}")
     public ResponseEntity<TaskResponseDTO> assignTask(@PathVariable UUID uuid, @PathVariable UUID employeeUuid) {
         return ResponseEntity.ok(taskService.assignTask(uuid, employeeUuid));
     }
 
+    @Operation(
+            summary = "Desasignar tarea",
+            description = "Desasigna la tarea a un emploeado"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Se desasigna la tarea a un empleado correctamente"),
+            @ApiResponse(responseCode = "403", description = "Error de autorización, JWT no válido")
+    })
     @PutMapping("/{uuid}/employees")
     public ResponseEntity<TaskResponseDTO> unassignTask(@PathVariable UUID uuid) {
         return ResponseEntity.ok(taskService.unassingTask(uuid));
