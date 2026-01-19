@@ -1,39 +1,41 @@
 # Task Manager API 
 Task Manager API to manage employees, tasks and projects.
 
+
+## Table of Contents
+
+- [Description](#description)
+- [Project Goals](#project-goals)
+- [Main Features](#main-features)
+- [Technologies](#technologies)
+- [Installation and Configuration](#installation-and-configuration)
+- [Run with Docker](#run-with-docker)
+- [Usage](#usage)
+- [Project Architecture](#project-architecture)
+- [Roadmap](#roadmap)
+- [Author](#author)
+
 ---
 
 ## Description
-A clean and well-structured API created using Spring Boot in a layered architecture. 
-This is my first project using Spring, developed with the purpose of learn backend professional concepts.
+Task Manager API built with Spring Boot following clean architecture and industry best practices.
+This project focuses on backend development concepts such security, persistence, testing and good API design.
 
 ---
 
-### What I learned
+## Project Goals
 
-- **Spring Boot** core concepts (IoC, DI, component scanning)
+The main purpose of this is apply the best practices while simulating a real-world application.
 
-- **REST API** design and best practices
-
-- **Layered architecture** (Controller → Service → Repository)
-
-- **JPA/Hibernate** (entity mapping, relationships, lazy and eager loading)
-
-- DTO usage and mapping (using Java Records)
-
-- Centralized exception handling (**GlobalExceptionHandler**)
-
-- **JWT** authentication with Spring Security
-
-- Control access using roles (ROLE_USER, ROLE_ADMIN)
-
-- Logging strategy with SLF4J
-
-- Writing unit tests with **JUnit + Mockito**
-
-- Testing workflows using **Postman**
-
-- Database migrations with **Flyway**
+- Designing a clean and maintainable REST API
+- Applying layered architecture principles (Controller, Service, Repository)
+- Implementing authentication and authorization using JWT
+- Managing persistence with JPA and PostgreSQL
+- Handling database versioning with Flyway
+- Applying centralized exception handling
+- Implementing role-based access control
+- Writing unit tests for business logic
+- Preparing the application for containerized deployment using Docker
 
 ---
 
@@ -53,10 +55,13 @@ This is my first project using Spring, developed with the purpose of learn backe
 - PostgreSQL (Relational DB)
 - JUnit and Mockito (Unit tests)
 - Flyway (DB Migrations)
+- Docker (Containerization)
 
 ---
 
 ## Installation and configuration
+
+
 
 1. Cloning the repository
 
@@ -87,6 +92,17 @@ mvn clean install
 ```bash
 mvn spring-boot:run
 ```
+
+---
+
+## Run with Docker
+```bash
+docker compose up --build
+```
+
+The application will be available at:
+
+http://localhost:8080
 
 ---
 
@@ -124,7 +140,7 @@ mvn spring-boot:run
   - List project employees: GET /{id}/employees
   - List project tasks: GET /{id}/tasks
 
-## Project architecture (Layered)
+## Project architecture
 
 ```text
 src/main/java/com/example/demoPersonal
@@ -145,26 +161,26 @@ src/main/java/com/example/demoPersonal
 
 ### Completed
 
-- Implemented layered architecture (Controller → Service → Repository)
-- Entity modeling with JPA/Hibernate (relationships, lazy loading)
-- DTO mapping using Java Records
-- Global exception handling (GlobalExceptionHandler)
-- Business rules implemented in services
-- Logging using SLF4J
-- JWT authentication & authorization (Spring Security)
-- Password hashing with BCrypt
-- Unit tests for service layer (JUnit + Mockito)
-- API tested manually using Postman
-- Initial documentation and project setup
-- Implement flyway to manage db migrations
-- Implement roles and endpoint control access
-- Create endpoint "self" (Employees with role "User" just can see their tasks, and their project unassigned tasks.)
-- Refactor ID and use UUID instead.
+- Implemented layered architecture (Controller → Service → Repository)  ✅
+- Entity modeling with JPA/Hibernate (relationships, lazy loading)  ✅
+- DTO mapping using Java Records  ✅
+- Global exception handling (GlobalExceptionHandler)  ✅
+- Business rules implemented in services  ✅
+- Logging using SLF4J  ✅
+- JWT authentication & authorization (Spring Security)  ✅
+- Password hashing with BCrypt  ✅
+- Unit tests for service layer (JUnit + Mockito)  ✅
+- API tested manually using Postman  ✅
+- Initial documentation and project setup  ✅
+- Implement flyway to manage db migrations  ✅
+- Implement roles and endpoint control access  ✅
+- Create endpoint "self" (Employees with role "User" just can see their tasks, and their project unassigned tasks.)  ✅
+- Refactor ID and use UUID instead.  ✅
+- Controller layer tests (MockMvc)  ✅
+- Document API using OpenAPI/Swagger  ✅
+- Containerization with Docker  ✅
 
 ### TO-DO
-- Controller layer tests (MockMvc)
-- Document API using OpenAPI/Swagger
-- Containerization with Docker
 
 ### Considerations
 - CI Pipeline (GitHub Actions)
