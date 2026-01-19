@@ -42,7 +42,7 @@ public class EmployeeControllerTest {
                 Position.DEVELOPER,
                 List.of()));
 
-        mockMvc.perform(post("/employees")
+        mockMvc.perform(post("/api/v1/employees")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -64,7 +64,7 @@ public class EmployeeControllerTest {
 
        doNothing().when(employeeService).removeEmployee(uuid);
 
-       mockMvc.perform(delete("/employees/{uuid}", uuid)).andExpect(status().isNoContent());
+       mockMvc.perform(delete("/api/v1/employees/{uuid}", uuid)).andExpect(status().isNoContent());
 
        verify(employeeService).removeEmployee(uuid);
     }
@@ -86,7 +86,7 @@ public class EmployeeControllerTest {
 
         when(employeeService.assignProject(employeeUuid, projectUuid)).thenReturn(response);
 
-        mockMvc.perform(put("/employees/{employeeUuid}/projects/{projectUuid}", employeeUuid, projectUuid))
+        mockMvc.perform(put("/api/v1/employees/{employeeUuid}/projects/{projectUuid}", employeeUuid, projectUuid))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uuid").value(employeeUuid.toString()))
                 .andExpect(jsonPath("$.projects[0].uuid").value(projectUuid.toString()));

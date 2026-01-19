@@ -47,7 +47,7 @@ public class TaskControllerTest {
                 projectUuid
         ));
 
-        mockMvc.perform(post("/tasks")
+        mockMvc.perform(post("/api/v1/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                        {
@@ -66,7 +66,7 @@ public class TaskControllerTest {
 
         doNothing().when(taskService).removeTask(uuid);
 
-        mockMvc.perform(delete("/tasks/{uuid}", uuid)).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v1/tasks/{uuid}", uuid)).andExpect(status().isNoContent());
 
         verify(taskService).removeTask(uuid);
     }

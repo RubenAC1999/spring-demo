@@ -35,7 +35,7 @@ public class AuthControllerTest {
     void login_shouldReturnToken() throws Exception {
         when(authService.login(any(LoginRequestDTO.class))).thenReturn(new AuthResponseDTO("jwt"));
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {"email":"test@gmail.com", "password":"abc123."}
@@ -48,7 +48,7 @@ public class AuthControllerTest {
     void register_shouldReturnToken() throws Exception {
         when(authService.register(any(RegisterRequestDTO.class))).thenReturn(new AuthResponseDTO("jwt"));
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {"name":"test", "email":"test@gmail.com", "position":"DEVELOPER", "password":"abc123."}
