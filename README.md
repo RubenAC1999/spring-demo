@@ -181,6 +181,11 @@ src/main/java/com/example/demoPersonal
 - Containerization with Docker  ✅
 
 ### TO-DO
+- Fix HTTP response code bug
+- Document more endpoints in Swagger/OpenAPI
+- Update Readme with new screenshots and "Run with docker" part improved.
+- Add a simple Pipeline using GitHub Actions
+- Integration tests with testcontainer
 
 ### Considerations
 - CI Pipeline (GitHub Actions)
