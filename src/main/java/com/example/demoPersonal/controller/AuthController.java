@@ -56,7 +56,7 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "Datos inválidos")
     })
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO dto) {
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid LoginRequestDTO dto) {
         return ResponseEntity.ok(authService.login(dto));
     }
 

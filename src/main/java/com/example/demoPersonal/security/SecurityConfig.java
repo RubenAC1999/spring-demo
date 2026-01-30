@@ -1,6 +1,5 @@
 package com.example.demoPersonal.security;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,10 +19,13 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomUserDetailsService userDetailsService,
+                          JwtAuthEntryPoint jwtAuthEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
+        this.jwtAuthEntryPoint = jwtAuthEntryPoint;
     }
 
     @Bean
@@ -32,12 +34,12 @@ public class SecurityConfig {
                 csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("api/v1/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/employees/me/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().hasRole("ADMIN")
                 ).userDetailsService(userDetailsService)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint));
 
         return http.build();
     }

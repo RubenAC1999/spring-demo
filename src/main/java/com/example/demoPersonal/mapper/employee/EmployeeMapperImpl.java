@@ -18,8 +18,8 @@ public class EmployeeMapperImpl implements EmployeeMapper {
     public EmployeeResponseDTO toDTO(Employee employee) {
         return new EmployeeResponseDTO(
                 employee.getUuid(),
-                employee.getName(),
                 employee.getEmail(),
+                employee.getName(),
                 employee.getPosition(),
                 employee.getProjects()
                         .stream()
