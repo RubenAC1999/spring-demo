@@ -1,5 +1,5 @@
-# Task Manager API 
-Task Manager API to manage employees, tasks and projects.
+# Company Management API
+Company Management API to manage employees, tasks and projects.
 
 
 ## Table of Contents
