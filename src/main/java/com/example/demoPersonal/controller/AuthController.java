@@ -9,6 +9,7 @@ import com.example.demoPersonal.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Authorization", description = "Authorization operations")
 public class AuthController {
     private final AuthService authService;
 
@@ -34,12 +36,13 @@ public class AuthController {
     }
 
     @Operation(
-            summary = "Registrar usuario",
-            description = "Crear un nuevo usuario en el sistema"
+            summary = "Register an user",
+            description = "Create a new user in the system"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Usuario creado correctamente"),
-            @ApiResponse(responseCode = "403", description = "Datos inválidos")
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid data or bad request"),
+            @ApiResponse(responseCode = "409", description = "An user already exists with the same email")
     })
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@RequestBody @Valid RegisterRequestDTO dto) {
@@ -48,12 +51,13 @@ public class AuthController {
 
 
     @Operation(
-            summary = "Iniciar sesión",
-            description = "Iniciar sesión en el sistema"
+            summary = "Log in",
+            description = "Log in in the system"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Iniciada sesión correctamente"),
-            @ApiResponse(responseCode = "403", description = "Datos inválidos")
+            @ApiResponse(responseCode = "200", description = "User logged successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid data or bad request"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid LoginRequestDTO dto) {
