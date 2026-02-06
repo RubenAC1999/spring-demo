@@ -5,6 +5,7 @@ Company Management API to manage employees, tasks and projects.
 ## Table of Contents
 
 - [Description](#description)
+- [Api Documentation](#api-documentation)
 - [Project Goals](#project-goals)
 - [Main Features](#main-features)
 - [Technologies](#technologies)
@@ -20,6 +21,13 @@ Company Management API to manage employees, tasks and projects.
 ## Description
 Task Manager API built with Spring Boot following clean architecture and industry best practices.
 This project focuses on backend development concepts such security, persistence, testing and good API design.
+
+---
+
+## Api Documentation
+This API is documented using OpenAPI (Swagger), providing clear overview of all available endpoints and security requiremets.
+
+![Swagger API](docs/screenshots/swagger-api.png)
 
 ---
 
@@ -103,6 +111,14 @@ docker compose up --build
 The application will be available at:
 
 http://localhost:8080
+
+### Default Admin User
+For a quick test, the application includes a Flyway migration that creates an **admin user** automatically.
+
+You can use the following credentials to authenticate and test secured endpoints:
+
+- **Email:** `admin@local.com`
+- **Password:** `abc123.`
 
 ---
 
