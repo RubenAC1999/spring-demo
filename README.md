@@ -1,3 +1,5 @@
+![CI](https://github.com/RubenAC1999/spring-demo/actions/workflows/ci.yml/badge.svg)
+
 # Company Management API
 Company Management API to manage employees, tasks and projects.
 
