@@ -7,7 +7,7 @@ SET uuid = gen_random_uuid()
 WHERE uuid IS NULL;
 
 ALTER TABLE employees
-SET COLUMN uuid NOT NULL;
+ALTER COLUMN uuid SET NOT NULL;
 
 CREATE UNIQUE INDEX idx_employees_uuid ON employees(uuid);
 
@@ -20,7 +20,7 @@ SET uuid = gen_random_uuid()
 WHERE uuid IS NULL;
 
 ALTER TABLE tasks
-SET COLUMN uuid NOT NULL;
+ALTER COLUMN uuid SET NOT NULL;
 
 CREATE UNIQUE INDEX idx_tasks_uuid ON tasks(uuid);
 
@@ -33,7 +33,7 @@ SET uuid = gen_random_uuid()
 WHERE uuid IS NULL;
 
 ALTER TABLE projects
-SET COLUMN uuid NOT NULL;
+ALTER COLUMN uuid SET NOT NULL;
 
 CREATE UNIQUE INDEX idx_projects_uuid ON projects(uuid);
 

@@ -5,6 +5,7 @@ id BIGSERIAL PRIMARY KEY,
 name VARCHAR(100) NOT NULL,
 email VARCHAR(150) NOT NULL UNIQUE,
 password VARCHAR(255) NOT NULL,
+position VARCHAR(255) NOT NULL,
 role VARCHAR(50) NOT NULL
 );
 
@@ -24,7 +25,7 @@ status VARCHAR(50) NOT NULL,
 created_at TIMESTAMP NOT NULL DEFAULT now(),
 updated_at TIMESTAMP NOT NULL DEFAULT now(),
 project_id BIGINT NOT NULL,
-employee_id BIGINT
+employee_id BIGINT,
 
 CONSTRAINT fk_task_project
 FOREIGN KEY (project_id)

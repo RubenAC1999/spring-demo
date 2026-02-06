@@ -15,6 +15,9 @@ spring:
 
   flyway:
     enabled: true
+    schemas: company
+    default-schema: company
+    create-schemas: true
 
   springdoc:
     swagger-ui:
@@ -26,5 +29,7 @@ spring:
     level:
       org.springframework.security: DEBUG
       org.hibernate.SQL: DEBUG
+
+
 
 
