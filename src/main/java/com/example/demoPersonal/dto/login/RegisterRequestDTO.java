@@ -6,9 +6,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record RegisterRequestDTO(
-    @NotBlank String name,
-    @NotBlank @Email String email,
-    @NotNull Position position,
-    @NotBlank String password
-            )
-{}
+    @NotBlank(message = "Name is required.")
+    String name,
+
+    @NotBlank(message = "Email is required.")
+    @Email
+    String email,
+
+    @NotNull (message = "Position is required.")
+    Position position,
+
+    @NotBlank (message = "Password is required.")
+    String password
+) {}

@@ -13,11 +13,9 @@ import com.example.demoPersonal.mapper.employee.EmployeeMapper;
 import com.example.demoPersonal.mapper.task.TaskMapper;
 import com.example.demoPersonal.repository.EmployeeRepository;
 import com.example.demoPersonal.repository.ProjectRepository;
-import com.example.demoPersonal.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +27,6 @@ import java.util.UUID;
 @Transactional
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
-    private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
 
     private final EmployeeMapper employeeMapper;
@@ -39,18 +36,15 @@ public class EmployeeService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public EmployeeService(EmployeeRepository employeeRepository, TaskRepository taskRepository,
-                           ProjectRepository projectRepository, EmployeeMapper employeeMapper, TaskMapper taskMapper,
-                           PasswordEncoder passwordEncoder) {
+    public EmployeeService(EmployeeRepository employeeRepository, ProjectRepository projectRepository,
+                           EmployeeMapper employeeMapper, TaskMapper taskMapper, PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
-        this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.employeeMapper = employeeMapper;
         this.taskMapper = taskMapper;
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional(readOnly = true)
     private Employee findByUuidOrThrow(UUID uuid) {
         log.debug("Searching employee with uuid = {}", uuid);
         return employeeRepository.findByUuid(uuid).orElseThrow(() -> new EmployeeNotFoundException(uuid));

@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc(addFilters = false) // Necesario para desactivar filtros security
-public class AuthControllerTest {
+class AuthControllerTest {
     @Autowired MockMvc mockMvc;
 
     @MockitoBean JwtService jwtService;

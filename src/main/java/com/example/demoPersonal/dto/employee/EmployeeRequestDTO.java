@@ -5,11 +5,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record EmployeeRequestDTO (
+public record EmployeeRequestDTO(
+
         @NotBlank(message = "Name is required")
         String name,
 
-        @NotBlank(message = "Email is required") @Email
+        @NotBlank(message = "Email is required")
+        @Email
         String email,
 
         @NotNull(message = "Position cannot be null")

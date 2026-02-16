@@ -22,13 +22,4 @@ public class TaskMapperImpl implements TaskMapper {
                 task.getProject().getUuid()
                 );
     }
-
-    @Override
-    public Task toEntity(TaskRequestDTO dto, Project project) {
-        Task task = new Task();
-        task.setDescription(dto.description());
-        task.setProject(project);
-
-        return task;
-    }
 }

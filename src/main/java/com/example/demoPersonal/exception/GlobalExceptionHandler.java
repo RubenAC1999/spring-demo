@@ -13,11 +13,14 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(EmployeeNotFoundException.class)
-    public ResponseEntity<ApiError> handleEmployeeNotFound(EmployeeNotFoundException exception,
-                                                           HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleEmployeeNotFound(
+            EmployeeNotFoundException exception,
+            HttpServletRequest request) {
+
         ApiError error = new ApiError(
                 exception.getMessage(),
                 HttpStatus.NOT_FOUND.value(),
@@ -26,13 +29,17 @@ public class GlobalExceptionHandler {
         );
 
         log.warn("Employee not found");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(error);
     }
 
-
     @ExceptionHandler(EmployeeExistsException.class)
-    public ResponseEntity<ApiError> handleEmployeeExists(EmployeeExistsException exception,
-                                                         HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleEmployeeExists(
+            EmployeeExistsException exception,
+            HttpServletRequest request) {
+
         ApiError error = new ApiError(
                 exception.getMessage(),
                 HttpStatus.CONFLICT.value(),
@@ -40,13 +47,15 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(error);
     }
 
-
     @ExceptionHandler(ProjectNotFoundException.class)
-    public ResponseEntity<ApiError> handleProjectNotFound(ProjectNotFoundException exception,
-                                                          HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleProjectNotFound(
+            ProjectNotFoundException exception,
+            HttpServletRequest request) {
 
         ApiError error = new ApiError(
                 exception.getMessage(),
@@ -55,12 +64,16 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(error);
     }
 
     @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<ApiError> handleTaskNotFound(TaskNotFoundException exception, HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleTaskNotFound(
+            TaskNotFoundException exception,
+            HttpServletRequest request) {
+
         ApiError error = new ApiError(
                 exception.getMessage(),
                 HttpStatus.NOT_FOUND.value(),
@@ -68,7 +81,8 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(error);
     }
-
 }

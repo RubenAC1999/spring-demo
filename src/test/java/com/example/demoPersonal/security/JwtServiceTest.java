@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JwtServiceTest {
+class JwtServiceTest {
     private final JwtService jwtService = new JwtService();
 
     private final UserDetails userDetails = User.withUsername("test@gmail.com")

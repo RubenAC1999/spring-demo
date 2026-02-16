@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = EmployeeController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class EmployeeControllerTest {
+class EmployeeControllerTest {
     @Autowired MockMvc mockMvc;
 
     @MockitoBean EmployeeService employeeService;

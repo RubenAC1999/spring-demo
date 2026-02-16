@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = TaskController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class TaskControllerTest {
+class TaskControllerTest {
     @Autowired MockMvc mockMvc;
 
     @MockitoBean TaskService taskService;

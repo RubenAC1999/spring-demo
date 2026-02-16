@@ -19,17 +19,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
+class AuthServiceTest {
     @Mock
     private EmployeeRepository employeeRepository;
     @Mock
@@ -91,9 +88,6 @@ public class AuthServiceTest {
     void login_shouldReturnDTO() {
         // GIVEN
         LoginRequestDTO dto = new LoginRequestDTO("test@gmail.com", "abc123.");
-        UUID employeeUuid = UUID.randomUUID();
-
-
         UserDetails userDetails = User.withUsername("test@gmail.com")
                 .password("encoded")
                 .authorities("ROLE_USER")
