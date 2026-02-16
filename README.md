@@ -1,4 +1,8 @@
 ![CI](https://github.com/RubenAC1999/spring-demo/actions/workflows/ci.yml/badge.svg)
+![Java](https://img.shields.io/badge/Java-17-blue)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-3.x-green)
+![Docker](https://img.shields.io/badge/Docker-ready-blue)
+
 
 # Company Management API
 Company Management API to manage employees, tasks and projects.
@@ -66,12 +70,12 @@ The main purpose of this is apply the best practices while simulating a real-wor
 - JUnit and Mockito (Unit tests)
 - Flyway (DB Migrations)
 - Docker (Containerization)
+- GitHub Actions (CI)
+- SonarLite (AI Code Review)
 
 ---
 
 ## Installation and configuration
-
-
 
 1. Cloning the repository
 
@@ -127,36 +131,36 @@ You can use the following credentials to authenticate and test secured endpoints
 ## Usage
 ### Main endpoints
 - **Authorization**
-    - Register: POST /auth/register
-    - Log in: POST /auth/login
+    - Register: POST api/v1/auth/register
+    - Log in: POST api/v1/auth/login
 
 - **Employees**
     - List all employees: GET /employees
     - Obtain a employee:
-      - By ID: GET /employees/{id}
-      - By email: GET /employees/search?email=example
-      - By name: GET /employees/search-by-name?name=example
-      - By position: GET /employees/search-by-position?position=DEVELOPER
-    - List employee's tasks: /employees/{id}/tasks
-    - Assign a project: PUT /employees/{id}/assignProject/{projectId}
-    - Unassign a project: PUT /employees/{id}/unassignProject/{projectId}
+      - By UUID: GET api/v1/employees/{uuid}
+      - By email: GET api/v1/employees/search?email=example
+      - By name: GET api/v1/employees/search-by-name?name=example
+      - By position: GET api/v1/employees/search-by-position?position=DEVELOPER
+    - List employee's tasks: api/v1/employees/{uuid}/tasks
+    - Assign a project: PUT api/v1/employees/{uuid}/assignProject/{projectUuid}
+    - Unassign a project: PUT api/v1/employees/{uuid}/unassignProject/{projectUuid}
 
 - **Tasks**
-  - List all tasks: GET /tasks (Pageable)
+  - List all tasks: GET api/v1/tasks (Pageable)
   - Obtain tasks:
-      - By ID: GET /tasks/{id}
-      - By description: GET /tasks/search-by-description?description="description"
-      - By status: GET /tasks/search-by-status?status=status
-      - unassigned: GET /tasks/search-unassigned
-    - Assign it to an employee: PUT /tasks/{id}/assign/{employeeId}
+      - By UUID: GET api/v1/tasks/{Uuid}
+      - By description: GET api/v1/tasks/search-by-description?description="description"
+      - By status: GET api/v1/tasks/search-by-status?status=status
+      - unassigned: GET api/v1/tasks/search-unassigned
+    - Assign it to an employee: PUT api/v1/tasks/{uuid}/assign/{employeeUuidd}
 
 - **Projects**
-  - List all projects: GET /projects
+  - List all projects: GET api/v1/projects
   - Obtain projects:
-    - By ID: GET /projects/{id}
-    - By name: GET /projects/search?name="name"
-  - List project employees: GET /{id}/employees
-  - List project tasks: GET /{id}/tasks
+    - By UUID: GET api/v1/projects/{uuid}
+    - By name: GET api/v1/projects/search?name="name"
+  - List project employees: GET api/v1/{uuid}/employees
+  - List project tasks: GET api/v1/{uuid}/tasks
 
 ## Project architecture
 
@@ -197,18 +201,11 @@ src/main/java/com/example/demoPersonal
 - Controller layer tests (MockMvc)  ✅
 - Document API using OpenAPI/Swagger  ✅
 - Containerization with Docker  ✅
+- Fix HTTP response code bug ✅
+- Add a simple Pipeline using GitHub Actions ✅
 
 ### TO-DO
-- Fix HTTP response code bug
-- Document more endpoints in Swagger/OpenAPI
-- Update Readme with new screenshots and "Run with docker" part improved.
-- Add a simple Pipeline using GitHub Actions
-- Integration tests with testcontainer
-
-### Considerations
-- CI Pipeline (GitHub Actions)
 - Metrics and Monitoring
-- Deploy in cloud (AWS)
 
 ---
 
