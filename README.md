@@ -72,6 +72,7 @@ The main purpose of this is apply the best practices while simulating a real-wor
 - Docker (Containerization)
 - GitHub Actions (CI)
 - SonarLite (AI Code Review)
+- Spring actuator, Prometheus and Gradana (Monitoring)
 
 ---
 
@@ -203,9 +204,7 @@ src/main/java/com/example/demoPersonal
 - Containerization with Docker  ✅
 - Fix HTTP response code bug ✅
 - Add a simple Pipeline using GitHub Actions ✅
-
-### TO-DO
-- Metrics and Monitoring
+- Metrics and Monitoring ✅
 
 ---
 
