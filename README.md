@@ -25,7 +25,7 @@ Company Management API to manage employees, tasks and projects.
 ---
 
 ## Description
-Task Manager API built with Spring Boot following clean architecture and industry best practices.
+Company Management API built with Spring Boot following clean architecture and industry best practices.
 This project focuses on backend development concepts such security, persistence, testing and good API design.
 
 ---
